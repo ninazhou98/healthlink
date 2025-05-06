@@ -1,47 +1,52 @@
-import { NextResponse } from "next/server"
-import axios from "axios"
+import { NextResponse } from "next/server";
 
+// Mock data for appointments
+// In a real application, this would connect to the Sikka API endpoint:
+// https://api.sikkasoft.com/v4/appointments
 export async function GET() {
   try {
-    // In a production environment, this would call the Sikka API
-    // const response = await axios.get('https://api.sikkasoft.com/v4/appointments')
-    // return NextResponse.json(response.data)
-    
-    // For demonstration, return mock data
-    return NextResponse.json([
+    // Mock appointment data
+    const appointments = [
       {
         id: 1,
-        date: "2023-06-15",
+        type: "Annual Physical",
+        date: "May 15, 2023",
         time: "10:00 AM",
-        doctor: "Dr. Sarah Johnson",
-        type: "Annual Check-up",
-        location: "Main Clinic, Room 204",
-        status: "confirmed"
+        doctor: "Smith",
+        location: "Main Clinic"
       },
       {
         id: 2,
-        date: "2023-06-22",
+        type: "Dental Cleaning",
+        date: "May 22, 2023",
         time: "2:30 PM",
-        doctor: "Dr. Michael Chen",
-        type: "Follow-up",
-        location: "North Wing, Room 118",
-        status: "confirmed"
+        doctor: "Johnson",
+        location: "Dental Office"
       },
       {
         id: 3,
-        date: "2023-07-05",
-        time: "11:15 AM",
-        doctor: "Dr. Emily Rodriguez",
-        type: "Consultation",
-        location: "Specialty Center, Room 305",
-        status: "pending"
+        type: "Eye Exam",
+        date: "June 5, 2023",
+        time: "9:15 AM",
+        doctor: "Williams",
+        location: "Vision Center"
+      },
+      {
+        id: 4,
+        type: "Follow-up Visit",
+        date: "June 12, 2023",
+        time: "11:30 AM",
+        doctor: "Brown",
+        location: "Main Clinic"
       }
-    ])
+    ];
+
+    return NextResponse.json(appointments);
   } catch (error) {
-    console.error("Error fetching appointments:", error)
+    console.error("Error fetching appointments:", error);
     return NextResponse.json(
       { error: "Failed to fetch appointments" },
       { status: 500 }
-    )
+    );
   }
 }

@@ -1,206 +1,134 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Navigation } from "@/components/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { PaperPlaneIcon } from "lucide-react"
+import { Navigation } from "@/components/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { MessageSquare, ArrowLeft, Send } from "lucide-react";
+import Link from "next/link";
 
 export default function MessagesPage() {
-  const [conversations, setConversations] = useState([])
-  const [selectedConversation, setSelectedConversation] = useState(null)
-  const [newMessage, setNewMessage] = useState("")
-  
-  useEffect(() => {
-    // Mock data for conversations
-    const mockConversations = [
-      {
-        id: 1,
-        with: "Dr. Sarah Johnson",
-        avatar: "",
-        lastMessage: "Your test results look good. Let's discuss at your next appointment.",
-        date: "Today",
-        unread: true,
-        messages: [
-          { id: 1, sender: "doctor", content: "Hello! How are you feeling today?", time: "10:30 AM" },
-          { id: 2, sender: "patient", content: "I'm feeling much better, thank you!", time: "10:35 AM" },
-          { id: 3, sender: "doctor", content: "That's great to hear. Your test results look good. Let's discuss at your next appointment.", time: "10:40 AM" }
-        ]
-      },
-      {
-        id: 2,
-        with: "Dr. Michael Chen",
-        avatar: "",
-        lastMessage: "Please remember to take your medication as prescribed.",
-        date: "Yesterday",
-        unread: false,
-        messages: [
-          { id: 1, sender: "doctor", content: "Have you been taking your medication regularly?", time: "2:15 PM" },
-          { id: 2, sender: "patient", content: "Yes, I've been following the schedule.", time: "2:20 PM" },
-          { id: 3, sender: "doctor", content: "Please remember to take your medication as prescribed.", time: "2:25 PM" }
-        ]
-      },
-      {
-        id: 3,
-        with: "Nurse Emily",
-        avatar: "",
-        lastMessage: "Your prescription has been renewed and sent to your pharmacy.",
-        date: "May 10",
-        unread: false,
-        messages: [
-          { id: 1, sender: "nurse", content: "I've processed your prescription renewal request.", time: "11:00 AM" },
-          { id: 2, sender: "patient", content: "Thank you! When will it be ready?", time: "11:05 AM" },
-          { id: 3, sender: "nurse", content: "Your prescription has been renewed and sent to your pharmacy.", time: "11:10 AM" }
-        ]
-      }
-    ]
-    
-    setConversations(mockConversations)
-    setSelectedConversation(mockConversations[0])
-  }, [])
-  
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return
-    
-    const updatedConversation = {
-      ...selectedConversation,
-      messages: [
-        ...selectedConversation.messages,
-        {
-          id: selectedConversation.messages.length + 1,
-          sender: "patient",
-          content: newMessage,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]
+  const messages = [
+    {
+      id: 1,
+      sender: "Dr. Smith",
+      subject: "Lab Results Available",
+      date: "May 3, 2023",
+      content: "Your recent lab results are now available. Overall, everything looks good. Your cholesterol levels have improved since your last visit. Keep up the good work with your diet and exercise routine.",
+      read: true
+    },
+    {
+      id: 2,
+      sender: "Dr. Johnson",
+      subject: "Prescription Refill",
+      date: "April 30, 2023",
+      content: "I've approved your prescription refill request. You can pick it up at your pharmacy tomorrow. Let me know if you have any questions about the dosage.",
+      read: true
+    },
+    {
+      id: 3,
+      sender: "Nurse Williams",
+      subject: "Appointment Confirmation",
+      date: "April 28, 2023",
+      content: "This is a confirmation for your upcoming appointment on May 15 at 10:00 AM. Please arrive 15 minutes early to complete any necessary paperwork.",
+      read: false
     }
-    
-    setSelectedConversation(updatedConversation)
-    setConversations(conversations.map(conv => 
-      conv.id === updatedConversation.id ? updatedConversation : conv
-    ))
-    setNewMessage("")
-  }
-  
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-800">
-      <header className="border-b bg-white dark:bg-slate-950 sticky top-0 z-10">
-        <div className="container flex h-16 items-center">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-              <span className="text-white font-bold">HL</span>
-            </div>
-            <span className="font-bold text-xl">HealthLink</span>
-          </div>
-          <div className="ml-auto flex items-center space-x-4">
-            <Navigation />
+    <div className="min-h-screen bg-slate-50">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-blue-700">HealthLink</h1>
           </div>
         </div>
       </header>
       
-      <main className="container py-10">
-        <h1 className="text-3xl font-bold mb-6">Messages</h1>
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <Navigation />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <div className="bg-white dark:bg-slate-950 rounded-lg shadow-sm border">
-              <div className="p-4 border-b">
-                <h2 className="font-semibold">Conversations</h2>
-              </div>
-              <div className="divide-y">
-                {conversations.map(conversation => (
-                  <div 
-                    key={conversation.id}
-                    className={`p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 ${selectedConversation?.id === conversation.id ? 'bg-slate-50 dark:bg-slate-900' : ''}`}
-                    onClick={() => setSelectedConversation(conversation)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarFallback>{conversation.with.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-medium truncate">{conversation.with}</h3>
-                          <span className="text-xs text-muted-foreground">{conversation.date}</span>
-                        </div>
-                        <p className={`text-sm truncate ${conversation.unread ? 'font-medium' : 'text-muted-foreground'}`}>
-                          {conversation.lastMessage}
-                        </p>
-                      </div>
-                      {conversation.unread && (
-                        <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          <div className="md:col-span-2">
-            {selectedConversation ? (
-              <Card className="h-full flex flex-col">
-                <div className="p-4 border-b flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback>{selectedConversation.with.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <h2 className="font-semibold">{selectedConversation.with}</h2>
-                </div>
-                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {selectedConversation.messages.map(message => (
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Dashboard
+          </Link>
+          <h2 className="text-2xl font-semibold text-slate-800">Messages</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MessageSquare className="h-5 w-5 mr-2 text-blue-600" />
+                  Inbox
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {messages.map((message) => (
                     <div 
                       key={message.id} 
-                      className={`flex ${message.sender === 'patient' ? 'justify-end' : 'justify-start'}`}
+                      className={`p-3 rounded-md cursor-pointer ${
+                        message.read ? 'bg-white' : 'bg-blue-50 border-l-4 border-blue-500'
+                      } hover:bg-slate-100`}
                     >
-                      <div 
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          message.sender === 'patient' 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-slate-100 dark:bg-slate-800'
-                        }`}
-                      >
-                        <p>{message.content}</p>
-                        <div className={`text-xs mt-1 ${message.sender === 'patient' ? 'text-blue-100' : 'text-muted-foreground'}`}>
-                          {message.time}
-                        </div>
+                      <div className="flex justify-between">
+                        <span className={`font-medium ${!message.read && 'text-blue-700'}`}>
+                          {message.sender}
+                        </span>
+                        <span className="text-xs text-slate-500">{message.date}</span>
                       </div>
+                      <p className="text-sm text-slate-700 truncate">{message.subject}</p>
                     </div>
                   ))}
-                </CardContent>
-                <div className="p-4 border-t">
-                  <div className="flex gap-2">
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>New Message</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      To:
+                    </label>
+                    <Input placeholder="Select recipient" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Subject:
+                    </label>
+                    <Input placeholder="Enter subject" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Message:
+                    </label>
                     <Textarea 
-                      placeholder="Type your message..." 
-                      className="min-h-[60px]"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault()
-                          handleSendMessage()
-                        }
-                      }}
+                      placeholder="Type your message here..." 
+                      className="min-h-[150px]"
                     />
-                    <Button 
-                      className="self-end"
-                      onClick={handleSendMessage}
-                    >
-                      <PaperPlaneIcon className="h-4 w-4" />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Message
                     </Button>
                   </div>
-                </div>
-              </Card>
-            ) : (
-              <Card className="h-full flex items-center justify-center">
-                <p className="text-muted-foreground">Select a conversation to start messaging</p>
-              </Card>
-            )}
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
