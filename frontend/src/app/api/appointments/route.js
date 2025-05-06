@@ -1,42 +1,42 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // In a real app, this would fetch data from the Sikka API
+    // In a real application, this would fetch data from the Sikka API
     // https://api.sikkasoft.com/v4/appointments
     
-    // For demo purposes, we'll return mock data
-    const mockAppointments = [
+    // Mock data for demonstration
+    const appointments = [
       {
         id: 1,
         type: "Annual Physical",
-        date: "May 15, 2023",
+        date: "June 15, 2023",
         time: "10:00 AM",
-        doctor: "Dr. Sarah Johnson",
-        status: "confirmed",
-        location: "Main Clinic"
+        doctor: "Johnson",
+        location: "Main Clinic",
+        status: "Confirmed"
       },
       {
         id: 2,
         type: "Dental Cleaning",
-        date: "May 22, 2023",
+        date: "June 22, 2023",
         time: "2:30 PM",
-        doctor: "Dr. Robert Chen",
-        status: "confirmed",
-        location: "Dental Office"
+        doctor: "Smith",
+        location: "Dental Office",
+        status: "Confirmed"
       },
       {
         id: 3,
-        type: "Follow-up Consultation",
-        date: "June 5, 2023",
-        time: "11:15 AM",
-        doctor: "Dr. Sarah Johnson",
-        status: "pending",
-        location: "Main Clinic"
+        type: "Eye Exam",
+        date: "July 5, 2023",
+        time: "1:15 PM",
+        doctor: "Garcia",
+        location: "Vision Center",
+        status: "Pending"
       }
     ];
 
-    return NextResponse.json(mockAppointments);
+    return NextResponse.json(appointments);
   } catch (error) {
     console.error("Error fetching appointments:", error);
     return NextResponse.json(

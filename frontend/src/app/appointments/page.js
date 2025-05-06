@@ -1,27 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Clock, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get('/api/appointments');
         setAppointments(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-        setError("Failed to load appointments");
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -30,66 +28,110 @@ export default function AppointmentsPage() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
       <Navigation />
       
-      <main className="flex-1 p-4 md:p-8 md:ml-64">
-        <Link href="/" className="inline-flex items-center text-blue-600 mb-6 hover:underline">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
-        </Link>
-        
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
-          <p className="text-gray-600 mt-2">View and manage your upcoming appointments</p>
-        </header>
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+        <div className="max-w-5xl mx-auto">
+          <header className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">Appointments</h1>
+              <p className="text-slate-500 mt-1">Manage your healthcare visits</p>
+            </div>
+            <Button className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              New Appointment
+            </Button>
+          </header>
 
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Upcoming Appointments</h2>
-          <Button>Schedule New</Button>
+          <Tabs defaultValue="upcoming" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+              <TabsTrigger value="past">Past</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="upcoming">
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {appointments.slice(0, 3).map((appointment, index) => (
+                    <Card key={index}>
+                      <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="flex items-start gap-4">
+                            <div className="bg-blue-100 p-3 rounded-md">
+                              <Calendar className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-lg">{appointment.type}</h3>
+                              <div className="flex items-center gap-2 text-slate-500 mt-1">
+                                <Clock className="h-4 w-4" />
+                                <span>{appointment.date} at {appointment.time}</span>
+                              </div>
+                              <p className="text-slate-500 mt-1">Dr. {appointment.doctor}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 md:flex-col lg:flex-row">
+                            <Button variant="outline">Reschedule</Button>
+                            <Button variant="destructive">Cancel</Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="past">
+              <div className="grid gap-4">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-slate-100 p-3 rounded-md">
+                          <Calendar className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-lg">Annual Physical</h3>
+                          <div className="flex items-center gap-2 text-slate-500 mt-1">
+                            <Clock className="h-4 w-4" />
+                            <span>April 15, 2023 at 10:00 AM</span>
+                          </div>
+                          <p className="text-slate-500 mt-1">Dr. Johnson</p>
+                        </div>
+                      </div>
+                      <Button variant="outline">View Summary</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-slate-100 p-3 rounded-md">
+                          <Calendar className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-lg">Dental Cleaning</h3>
+                          <div className="flex items-center gap-2 text-slate-500 mt-1">
+                            <Clock className="h-4 w-4" />
+                            <span>March 3, 2023 at 2:30 PM</span>
+                          </div>
+                          <p className="text-slate-500 mt-1">Dr. Smith</p>
+                        </div>
+                      </div>
+                      <Button variant="outline">View Summary</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-
-        {loading ? (
-          <div className="text-center py-10">
-            <p className="text-gray-500">Loading appointments...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-10">
-            <p className="text-red-500">{error}</p>
-          </div>
-        ) : appointments.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {appointments.map((appointment, index) => (
-              <Card key={index} className="overflow-hidden">
-                <div className={`h-2 ${appointment.status === 'confirmed' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">{appointment.type}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm">{appointment.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm">{appointment.time}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">Reschedule</Button>
-                    <Button variant="outline" size="sm" className="flex-1">Cancel</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-10 bg-white rounded-lg shadow-sm">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No Appointments</h3>
-            <p className="text-gray-500 mb-4">You don't have any upcoming appointments</p>
-            <Button>Schedule an Appointment</Button>
-          </div>
-        )}
       </main>
     </div>
   );
