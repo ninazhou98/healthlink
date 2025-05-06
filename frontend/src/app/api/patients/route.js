@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // In a real app, we would fetch from the Sikka API
+    // In a real app, you would fetch data from the Sikka API
     // const response = await fetch('https://api.sikkasoft.com/v4/patients', {
     //   headers: {
     //     'Authorization': `Bearer ${process.env.SIKKA_API_KEY}`
@@ -13,30 +13,36 @@ export async function GET() {
     // For demo purposes, return mock data
     const mockPatients = [
       {
-        id: "123456",
-        name: "Sarah Johnson",
-        email: "sarah.johnson@example.com",
+        id: 1,
+        firstName: "Jane",
+        lastName: "Doe",
+        email: "jane.doe@example.com",
         phone: "(555) 123-4567",
-        dob: "1985-06-15",
-        address: "123 Main St, Anytown, CA 12345",
+        address: "123 Main St",
+        city: "Anytown",
+        state: "CA",
+        zipCode: "12345",
+        dateOfBirth: "1985-06-15",
+        emergencyContact: "John Doe",
+        emergencyPhone: "(555) 987-6543",
         insurance: {
-          provider: "Blue Cross Blue Shield",
-          policyNumber: "BCBS-12345678",
-          groupNumber: "GRP-987654"
+          provider: "HealthPlus Insurance",
+          policyNumber: "HP12345678",
+          groupNumber: "GP987654",
+          coverageType: "PPO"
         },
-        emergencyContact: {
-          name: "Michael Johnson",
-          relationship: "Spouse",
-          phone: "(555) 987-6543"
-        }
+        medicalHistory: [
+          { condition: "Asthma", diagnosedYear: "2010", notes: "Mild, controlled with inhaler" },
+          { condition: "Allergies", diagnosedYear: "2008", notes: "Seasonal, pollen" }
+        ]
       }
     ];
     
     return NextResponse.json(mockPatients);
   } catch (error) {
-    console.error('Error fetching patients:', error);
+    console.error("Error fetching patients:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch patients' },
+      { error: "Failed to fetch patients" },
       { status: 500 }
     );
   }
