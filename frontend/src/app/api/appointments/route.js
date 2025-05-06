@@ -1,8 +1,39 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+
+// Mock data for appointments
+const mockAppointments = [
+  {
+    id: 1,
+    type: "Annual Physical",
+    doctor: "Dr. Sarah Johnson",
+    date: "2023-06-15",
+    time: "10:00 AM",
+    location: "Main Clinic, Room 302",
+    status: "confirmed"
+  },
+  {
+    id: 2,
+    type: "Cardiology Follow-up",
+    doctor: "Dr. Michael Chen",
+    date: "2023-06-22",
+    time: "2:30 PM",
+    location: "Cardiology Dept, Room 105",
+    status: "confirmed"
+  },
+  {
+    id: 3,
+    type: "Dental Cleaning",
+    doctor: "Dr. Emily Wilson",
+    date: "2023-07-05",
+    time: "9:15 AM",
+    location: "Dental Office, Suite 4",
+    status: "pending"
+  }
+];
 
 export async function GET() {
   try {
-    // In a real application, this would make a call to the Sikka API
+    // In a real application, you would fetch data from the Sikka API
     // const response = await fetch('https://api.sikkasoft.com/v4/appointments', {
     //   headers: {
     //     'Authorization': `Bearer ${process.env.SIKKA_API_KEY}`
@@ -10,42 +41,12 @@ export async function GET() {
     // });
     // const data = await response.json();
     
-    // For demonstration, we'll return mock data
-    const mockAppointments = [
-      {
-        id: 1,
-        type: "Annual Physical",
-        date: "May 15, 2023",
-        time: "10:00 AM",
-        provider: "Dr. Sarah Smith",
-        location: "Main Clinic - Room 102",
-        status: "confirmed"
-      },
-      {
-        id: 2,
-        type: "Dental Cleaning",
-        date: "May 22, 2023",
-        time: "2:30 PM",
-        provider: "Dr. James Wilson",
-        location: "Dental Office - Suite 305",
-        status: "scheduled"
-      },
-      {
-        id: 3,
-        type: "Eye Examination",
-        date: "June 5, 2023",
-        time: "9:15 AM",
-        provider: "Dr. Emily Chen",
-        location: "Vision Center - Room 204",
-        status: "confirmed"
-      }
-    ];
-    
+    // For now, we'll return mock data
     return NextResponse.json(mockAppointments);
   } catch (error) {
-    console.error('Error fetching appointments:', error);
+    console.error("Error fetching appointments:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch appointments' },
+      { error: "Failed to fetch appointments" },
       { status: 500 }
     );
   }
