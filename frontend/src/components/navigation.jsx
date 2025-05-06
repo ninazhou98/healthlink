@@ -17,28 +17,23 @@ export function Navigation() {
   };
 
   return (
-    <nav className="flex justify-center md:justify-start mb-8">
-      <div className="flex space-x-1 md:space-x-4 p-1 bg-slate-100 rounded-lg">
-        <Link href="/" className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/') ? 'bg-white shadow-sm text-blue-600' : 'text-slate-700 hover:bg-white/60'}`}>
-          <Home className="h-4 w-4 mr-2" />
-          <span>Dashboard</span>
-        </Link>
-        
-        <Link href="/appointments" className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/appointments') ? 'bg-white shadow-sm text-blue-600' : 'text-slate-700 hover:bg-white/60'}`}>
-          <Calendar className="h-4 w-4 mr-2" />
-          <span>Appointments</span>
-        </Link>
-        
-        <Link href="/messages" className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/messages') ? 'bg-white shadow-sm text-blue-600' : 'text-slate-700 hover:bg-white/60'}`}>
-          <MessageSquare className="h-4 w-4 mr-2" />
-          <span>Messages</span>
-        </Link>
-        
-        <Link href="/profile" className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/profile') ? 'bg-white shadow-sm text-blue-600' : 'text-slate-700 hover:bg-white/60'}`}>
-          <User className="h-4 w-4 mr-2" />
-          <span>Profile</span>
-        </Link>
-      </div>
+    <nav className="flex justify-center md:justify-start space-x-4 py-4 px-6 bg-white shadow-sm">
+      <Link href="/" className={`flex items-center space-x-2 ${isActive('/') ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-500'}`}>
+        <Home size={20} />
+        <span className="hidden md:inline">Dashboard</span>
+      </Link>
+      <Link href="/appointments" className={`flex items-center space-x-2 ${isActive('/appointments') ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-500'}`}>
+        <Calendar size={20} />
+        <span className="hidden md:inline">Appointments</span>
+      </Link>
+      <Link href="/messages" className={`flex items-center space-x-2 ${isActive('/messages') ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-500'}`}>
+        <MessageSquare size={20} />
+        <span className="hidden md:inline">Messages</span>
+      </Link>
+      <Link href="/profile" className={`flex items-center space-x-2 ${isActive('/profile') ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-500'}`}>
+        <User size={20} />
+        <span className="hidden md:inline">Profile</span>
+      </Link>
     </nav>
   );
 }
