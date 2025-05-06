@@ -1,42 +1,37 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // In a real application, this would fetch data from the Sikka API
-    // https://api.sikkasoft.com/v4/patients
+    // In a real application, this would make a call to the Sikka API
+    // const response = await fetch('https://api.sikkasoft.com/v4/patients', {
+    //   headers: {
+    //     'Authorization': `Bearer ${process.env.SIKKA_API_KEY}`
+    //   }
+    // });
+    // const data = await response.json();
     
-    // For demo purposes, we'll return mock data
-    const mockPatient = {
-      id: 12345,
-      firstName: "John",
-      lastName: "Doe",
-      dateOfBirth: "1985-06-15",
-      gender: "Male",
-      email: "john.doe@example.com",
-      phone: "(555) 123-4567",
-      address: {
-        street: "123 Main Street",
+    // For demonstration, we'll return mock data
+    const mockPatients = [
+      {
+        id: "P12345",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        phone: "(555) 123-4567",
+        dateOfBirth: "01/15/1980",
+        gender: "Male",
+        address: "123 Main Street",
         city: "Anytown",
         state: "CA",
         zipCode: "12345"
-      },
-      insurance: {
-        provider: "HealthPlus Insurance",
-        policyNumber: "HP-12345678",
-        groupNumber: "GRP-987654"
-      },
-      medicalHistory: {
-        allergies: ["Penicillin", "Peanuts"],
-        chronicConditions: ["Hypertension"],
-        currentMedications: ["Lisinopril 10mg", "Aspirin 81mg"]
       }
-    };
-
-    return NextResponse.json(mockPatient);
+    ];
+    
+    return NextResponse.json(mockPatients);
   } catch (error) {
-    console.error("Error fetching patient data:", error);
+    console.error('Error fetching patients:', error);
     return NextResponse.json(
-      { error: "Failed to fetch patient data" },
+      { error: 'Failed to fetch patients' },
       { status: 500 }
     );
   }

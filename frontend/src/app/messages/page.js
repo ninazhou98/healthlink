@@ -1,113 +1,69 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Plus } from "lucide-react";
+import { Send, Search } from "lucide-react";
 
 export default function MessagesPage() {
-  const [activeConversation, setActiveConversation] = useState(null);
-  const [message, setMessage] = useState("");
+  const [selectedConversation, setSelectedConversation] = useState(0);
   
-  // Mock conversations data
-  const [conversations, setConversations] = useState([
+  const conversations = [
     {
       id: 1,
-      name: "Dr. Sarah Johnson",
+      name: "Dr. Sarah Smith",
       role: "Primary Care Physician",
-      unread: true,
+      avatar: "/avatar-1.png",
       lastMessage: "Your test results look good. Let's discuss at your next appointment.",
+      time: "10:30 AM",
+      unread: true,
       messages: [
-        { id: 1, sender: "doctor", content: "Hello! How are you feeling today?", time: "10:30 AM" },
-        { id: 2, sender: "patient", content: "Much better, thank you. The medication is helping.", time: "10:35 AM" },
-        { id: 3, sender: "doctor", content: "That's great to hear! Your test results look good. Let's discuss at your next appointment.", time: "10:40 AM" }
+        { sender: "them", content: "Hello John, I've reviewed your recent lab results.", time: "10:15 AM" },
+        { sender: "them", content: "Your test results look good. Let's discuss at your next appointment.", time: "10:30 AM" },
       ]
     },
     {
       id: 2,
-      name: "Dr. Michael Chen",
-      role: "Cardiologist",
+      name: "Nurse Johnson",
+      role: "Clinic Nurse",
+      avatar: "/avatar-2.png",
+      lastMessage: "Reminder about your medication refill next week.",
+      time: "Yesterday",
       unread: false,
-      lastMessage: "Remember to take your blood pressure readings daily.",
       messages: [
-        { id: 1, sender: "doctor", content: "How's your blood pressure been this week?", time: "Yesterday" },
-        { id: 2, sender: "patient", content: "It's been stable, around 120/80.", time: "Yesterday" },
-        { id: 3, sender: "doctor", content: "That's excellent. Remember to take your blood pressure readings daily.", time: "Yesterday" }
+        { sender: "them", content: "Hi John, just checking in about your medication.", time: "Yesterday" },
+        { sender: "them", content: "Reminder about your medication refill next week.", time: "Yesterday" },
+        { sender: "me", content: "Thanks for the reminder. I'll take care of it.", time: "Yesterday" },
       ]
     },
     {
       id: 3,
-      name: "Nurse Emma Wilson",
-      role: "Clinic Nurse",
-      unread: true,
-      lastMessage: "Your prescription refill has been approved.",
+      name: "Dr. Michael Lee",
+      role: "Cardiologist",
+      avatar: "/avatar-3.png",
+      lastMessage: "Please complete the heart health questionnaire before your visit.",
+      time: "Monday",
+      unread: false,
       messages: [
-        { id: 1, sender: "nurse", content: "Hi there! Just checking in about your prescription refill request.", time: "2 days ago" },
-        { id: 2, sender: "patient", content: "Yes, I need a refill for my hypertension medication.", time: "2 days ago" },
-        { id: 3, sender: "nurse", content: "Your prescription refill has been approved. You can pick it up tomorrow.", time: "1 day ago" }
+        { sender: "them", content: "Hello John, I'm looking forward to your appointment next month.", time: "Monday" },
+        { sender: "them", content: "Please complete the heart health questionnaire before your visit.", time: "Monday" },
+        { sender: "me", content: "Will do, thank you.", time: "Monday" },
       ]
     }
-  ]);
+  ];
 
-  useEffect(() => {
-    // Set first conversation as active by default
-    if (conversations.length > 0 && !activeConversation) {
-      setActiveConversation(conversations[0]);
-    }
-  }, [conversations, activeConversation]);
-
-  const handleSendMessage = () => {
-    if (!message.trim() || !activeConversation) return;
-    
-    const newMessage = {
-      id: activeConversation.messages.length + 1,
-      sender: "patient",
-      content: message,
-      time: "Just now"
-    };
-    
-    const updatedConversations = conversations.map(conv => {
-      if (conv.id === activeConversation.id) {
-        return {
-          ...conv,
-          messages: [...conv.messages, newMessage],
-          lastMessage: message
-        };
-      }
-      return conv;
-    });
-    
-    setConversations(updatedConversations);
-    setActiveConversation({
-      ...activeConversation,
-      messages: [...activeConversation.messages, newMessage],
-      lastMessage: message
-    });
-    setMessage("");
-  };
-
-  const handleConversationClick = (conversation) => {
-    // Mark as read when clicked
-    const updatedConversations = conversations.map(conv => {
-      if (conv.id === conversation.id) {
-        return { ...conv, unread: false };
-      }
-      return conv;
-    });
-    
-    setConversations(updatedConversations);
-    setActiveConversation(conversation);
-  };
+  const activeConversation = conversations[selectedConversation];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-          <p className="text-gray-500 mt-1">Communicate with your healthcare team</p>
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold text-gray-900">HealthLink</h1>
+          <p className="text-sm text-gray-500">Patient Communication Portal</p>
         </div>
       </header>
       
@@ -115,117 +71,104 @@ export default function MessagesPage() {
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Your Conversations</h2>
-            <Button className="bg-green-600 hover:bg-green-700">
-              <Plus size={16} className="mr-2" />
-              New Message
-            </Button>
-          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">Messages</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Conversations List */}
-            <div className="md:col-span-1">
-              <Card className="h-[600px] overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="h-full flex flex-col">
-                    <div className="p-4 border-b">
-                      <Input placeholder="Search conversations..." className="w-full" />
-                    </div>
-                    <div className="flex-1 overflow-y-auto">
-                      {conversations.map((conversation) => (
-                        <div 
-                          key={conversation.id}
-                          className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${activeConversation?.id === conversation.id ? 'bg-blue-50' : ''}`}
-                          onClick={() => handleConversationClick(conversation)}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Avatar>
-                              <AvatarFallback>{conversation.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-gray-900 truncate">
-                                  {conversation.name}
-                                </p>
-                                {conversation.unread && (
-                                  <span className="inline-block w-2 h-2 bg-blue-600 rounded-full"></span>
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-500">{conversation.role}</p>
-                              <p className="text-sm text-gray-500 truncate mt-1">{conversation.lastMessage}</p>
-                            </div>
-                          </div>
+          <div className="flex flex-col md:flex-row h-[600px] bg-white rounded-lg shadow overflow-hidden">
+            {/* Conversation List */}
+            <div className="w-full md:w-1/3 border-r">
+              <div className="p-4 border-b">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input 
+                    placeholder="Search messages" 
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="overflow-y-auto h-[calc(600px-65px)]">
+                {conversations.map((conversation, index) => (
+                  <div 
+                    key={conversation.id}
+                    className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${selectedConversation === index ? 'bg-blue-50' : ''}`}
+                    onClick={() => setSelectedConversation(index)}
+                  >
+                    <div className="flex items-start">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="ml-3 flex-1">
+                        <div className="flex justify-between">
+                          <p className="text-sm font-medium text-gray-900">{conversation.name}</p>
+                          <p className="text-xs text-gray-500">{conversation.time}</p>
                         </div>
-                      ))}
+                        <p className="text-xs text-gray-500">{conversation.role}</p>
+                        <p className="text-sm text-gray-500 truncate mt-1">{conversation.lastMessage}</p>
+                      </div>
+                      {conversation.unread && (
+                        <span className="h-2 w-2 bg-blue-600 rounded-full"></span>
+                      )}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
             </div>
             
-            {/* Message Thread */}
-            <div className="md:col-span-2">
-              <Card className="h-[600px] overflow-hidden">
-                <CardContent className="p-0">
-                  {activeConversation ? (
-                    <div className="h-full flex flex-col">
-                      <div className="p-4 border-b bg-white">
-                        <div className="flex items-center space-x-3">
-                          <Avatar>
-                            <AvatarFallback>{activeConversation.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{activeConversation.name}</p>
-                            <p className="text-xs text-gray-500">{activeConversation.role}</p>
-                          </div>
-                        </div>
+            {/* Message Content */}
+            <div className="flex flex-col w-full md:w-2/3">
+              <div className="p-4 border-b bg-white">
+                <div className="flex items-center">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>{activeConversation.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900">{activeConversation.name}</p>
+                    <p className="text-xs text-gray-500">{activeConversation.role}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                {activeConversation.messages.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`mb-4 flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    {message.sender === 'them' && (
+                      <Avatar className="h-8 w-8 mr-2">
+                        <AvatarFallback>{activeConversation.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    )}
+                    <div>
+                      <div 
+                        className={`rounded-lg px-4 py-2 max-w-xs ${
+                          message.sender === 'me' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-white border'
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
                       </div>
-                      
-                      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {activeConversation.messages.map((msg) => (
-                          <div 
-                            key={msg.id} 
-                            className={`flex ${msg.sender === 'patient' ? 'justify-end' : 'justify-start'}`}
-                          >
-                            <div 
-                              className={`max-w-[80%] rounded-lg p-3 ${
-                                msg.sender === 'patient' 
-                                  ? 'bg-blue-500 text-white' 
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              <p>{msg.content}</p>
-                              <p className={`text-xs mt-1 ${
-                                msg.sender === 'patient' ? 'text-blue-100' : 'text-gray-500'
-                              }`}>{msg.time}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="p-4 border-t bg-white">
-                        <div className="flex space-x-2">
-                          <Input 
-                            placeholder="Type your message..." 
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                            className="flex-1"
-                          />
-                          <Button onClick={handleSendMessage} className="bg-blue-600 hover:bg-blue-700">
-                            <Send size={16} />
-                          </Button>
-                        </div>
-                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{message.time}</p>
                     </div>
-                  ) : (
-                    <div className="h-full flex items-center justify-center">
-                      <p className="text-gray-500">Select a conversation to start messaging</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="p-4 bg-white border-t">
+                <div className="flex items-end">
+                  <Textarea 
+                    placeholder="Type your message..." 
+                    className="flex-1 resize-none"
+                    rows={2}
+                  />
+                  <Button className="ml-2 h-10 w-10 p-0 rounded-full">
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex items-center mt-2 text-xs text-gray-500">
+                  <p>Messages are secure and encrypted</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
