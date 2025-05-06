@@ -1,141 +1,158 @@
 "use client";
 
 import { useState } from "react";
-import { Navigation } from "@/components/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Send, User } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, Send, Plus } from "lucide-react";
+import Navigation from "@/components/navigation";
 
 export default function MessagesPage() {
-  const [selectedConversation, setSelectedConversation] = useState(0);
-  
-  const conversations = [
-    {
-      name: "Dr. Johnson",
-      role: "Primary Care",
-      lastMessage: "Your lab results look good. Let's discuss at your next appointment.",
+  const [conversations] = useState([
+    { 
+      id: 1, 
+      name: "Dr. Sarah Smith", 
+      role: "Cardiologist",
+      lastMessage: "Your test results look good. Let's discuss at your next appointment.",
       time: "10:30 AM",
-      unread: true,
-      messages: [
-        { sender: "Dr. Johnson", content: "Hello Sarah, I've reviewed your recent lab results.", time: "10:25 AM" },
-        { sender: "Dr. Johnson", content: "Your cholesterol levels have improved since last time.", time: "10:26 AM" },
-        { sender: "Dr. Johnson", content: "Your lab results look good. Let's discuss at your next appointment.", time: "10:30 AM" },
-      ]
+      unread: true
     },
-    {
-      name: "Nurse Williams",
-      role: "Cardiology",
-      lastMessage: "Your prescription refill has been approved.",
+    { 
+      id: 2, 
+      name: "Dr. Michael Johnson", 
+      role: "Dermatologist",
+      lastMessage: "Please send a photo of how the affected area looks today.",
       time: "Yesterday",
-      unread: false,
-      messages: [
-        { sender: "Nurse Williams", content: "Hi Sarah, just following up on your prescription refill request.", time: "Yesterday" },
-        { sender: "Sarah", content: "Thank you for checking. I need it by this weekend.", time: "Yesterday" },
-        { sender: "Nurse Williams", content: "Your prescription refill has been approved.", time: "Yesterday" },
-      ]
+      unread: false
     },
-    {
-      name: "Dr. Martinez",
-      role: "Dermatology",
-      lastMessage: "Please apply the cream twice daily and avoid sun exposure.",
-      time: "Monday",
-      unread: false,
-      messages: [
-        { sender: "Dr. Martinez", content: "How is the new treatment working for your skin condition?", time: "Monday" },
-        { sender: "Sarah", content: "I'm seeing some improvement, but still have some redness.", time: "Monday" },
-        { sender: "Dr. Martinez", content: "Please apply the cream twice daily and avoid sun exposure.", time: "Monday" },
-      ]
+    { 
+      id: 3, 
+      name: "Nurse Williams", 
+      role: "Primary Care",
+      lastMessage: "Your prescription has been sent to your pharmacy.",
+      time: "May 2",
+      unread: false
     }
-  ];
+  ]);
+
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [messages] = useState([
+    { id: 1, sender: "doctor", content: "Hello! How are you feeling today?", time: "10:15 AM" },
+    { id: 2, sender: "patient", content: "I'm feeling much better, thank you. The new medication seems to be working well.", time: "10:20 AM" },
+    { id: 3, sender: "doctor", content: "That's great to hear! Any side effects?", time: "10:22 AM" },
+    { id: 4, sender: "patient", content: "Just a little drowsiness in the morning, but it goes away after an hour or so.", time: "10:25 AM" },
+    { id: 5, sender: "doctor", content: "Your test results look good. Let's discuss at your next appointment.", time: "10:30 AM" },
+  ]);
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <main className="flex-1 flex flex-col md:flex-row md:ml-64 h-screen">
-        <div className="w-full md:w-1/3 border-r border-gray-200 overflow-y-auto">
-          <div className="p-4 border-b">
-            <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-            <p className="text-gray-600 text-sm mt-1">Communicate with your healthcare team</p>
-          </div>
-          
-          <div className="divide-y">
-            {conversations.map((conversation, index) => (
-              <div 
-                key={index}
-                className={`p-4 cursor-pointer ${selectedConversation === index ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
-                onClick={() => setSelectedConversation(index)}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center">
-                    <div className="bg-blue-100 text-blue-700 p-2 rounded-full mr-3">
-                      <User size={20} />
-                    </div>
-                    <div>
-                      <h3 className="font-medium flex items-center">
-                        {conversation.name}
-                        {conversation.unread && (
-                          <span className="ml-2 w-2 h-2 bg-blue-600 rounded-full"></span>
-                        )}
-                      </h3>
-                      <p className="text-xs text-gray-500">{conversation.role}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-500">{conversation.time}</span>
-                </div>
-                <p className="text-sm text-gray-600 mt-2 line-clamp-1">{conversation.lastMessage}</p>
-              </div>
-            ))}
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 py-4">
+        <div className="max-w-screen-xl mx-auto px-4">
+          <h1 className="text-2xl font-bold text-blue-600">Messages</h1>
         </div>
-        
-        <div className="flex-1 flex flex-col h-full">
-          <div className="p-4 border-b flex items-center">
-            <div className="bg-blue-100 text-blue-700 p-2 rounded-full mr-3">
-              <User size={20} />
-            </div>
-            <div>
-              <h2 className="font-medium">{conversations[selectedConversation].name}</h2>
-              <p className="text-xs text-gray-500">{conversations[selectedConversation].role}</p>
-            </div>
-          </div>
-          
-          <div className="flex-1 p-4 overflow-y-auto">
-            {conversations[selectedConversation].messages.map((message, index) => (
-              <div 
-                key={index} 
-                className={`mb-4 flex ${message.sender === 'Sarah' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div 
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.sender === 'Sarah' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  <p className="text-sm">{message.content}</p>
-                  <p className={`text-xs mt-1 ${message.sender === 'Sarah' ? 'text-blue-100' : 'text-gray-500'}`}>
-                    {message.time}
-                  </p>
-                </div>
+      </header>
+
+      <main className="max-w-screen-xl mx-auto px-4 py-8 mb-16 md:mb-0">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Conversations List */}
+          <div className="w-full md:w-1/3">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="relative flex-grow">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                <Input placeholder="Search messages" className="pl-8" />
               </div>
-            ))}
-          </div>
-          
-          <div className="p-4 border-t">
-            <div className="flex items-center">
-              <Input 
-                placeholder="Type your message..." 
-                className="flex-1 mr-2"
-              />
               <Button size="icon" className="bg-blue-600 hover:bg-blue-700">
-                <Send size={18} />
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
+            
+            <div className="space-y-2">
+              {conversations.map((conversation) => (
+                <Card 
+                  key={conversation.id} 
+                  className={`cursor-pointer ${conversation.unread ? 'border-l-4 border-l-blue-500' : ''}`}
+                  onClick={() => setActiveConversation(conversation)}
+                >
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Avatar>
+                      <AvatarFallback>{conversation.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-grow min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-medium truncate">{conversation.name}</h3>
+                        <span className="text-xs text-gray-500">{conversation.time}</span>
+                      </div>
+                      <p className="text-xs text-gray-500">{conversation.role}</p>
+                      <p className="text-sm truncate">{conversation.lastMessage}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          
+          {/* Message Thread */}
+          <div className="w-full md:w-2/3 bg-white rounded-lg border border-gray-200 flex flex-col h-[600px]">
+            {activeConversation ? (
+              <>
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarFallback>{activeConversation.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium">{activeConversation.name}</h3>
+                      <p className="text-xs text-gray-500">{activeConversation.role}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                  {messages.map((message) => (
+                    <div 
+                      key={message.id} 
+                      className={`flex ${message.sender === 'patient' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div 
+                        className={`max-w-[80%] rounded-lg p-3 ${
+                          message.sender === 'patient' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <p className={`text-xs mt-1 ${message.sender === 'patient' ? 'text-blue-100' : 'text-gray-500'}`}>
+                          {message.time}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="p-4 border-t border-gray-200">
+                  <div className="flex gap-2">
+                    <Textarea 
+                      placeholder="Type your message..." 
+                      className="min-h-[60px] resize-none"
+                    />
+                    <Button className="bg-blue-600 hover:bg-blue-700 self-end">
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                Select a conversation to start messaging
+              </div>
+            )}
           </div>
         </div>
       </main>
+      
+      <Navigation />
     </div>
   );
 }
