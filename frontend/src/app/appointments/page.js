@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Clock, MapPin, Plus } from "lucide-react";
+import { Calendar, Clock, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import axios from "axios";
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -17,8 +19,9 @@ export default function AppointmentsPage() {
         const response = await axios.get('/api/appointments');
         setAppointments(response.data);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+        setError("Failed to load appointments");
         setLoading(false);
       }
     };
@@ -27,87 +30,67 @@ export default function AppointmentsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Appointments</h1>
-            <p className="mt-2 text-gray-600">View and manage your upcoming appointments</p>
-          </div>
-          <Button className="flex items-center">
-            <Plus className="mr-2 h-4 w-4" />
-            New Appointment
-          </Button>
+      <main className="flex-1 p-4 md:p-8 md:ml-64">
+        <Link href="/" className="inline-flex items-center text-blue-600 mb-6 hover:underline">
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back to Dashboard
+        </Link>
+        
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
+          <p className="text-gray-600 mt-2">View and manage your upcoming appointments</p>
+        </header>
+
+        <div className="mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Upcoming Appointments</h2>
+          <Button>Schedule New</Button>
         </div>
 
         {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-16 bg-gray-200 rounded"></div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="text-center py-10">
+            <p className="text-gray-500">Loading appointments...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-10">
+            <p className="text-red-500">{error}</p>
           </div>
         ) : appointments.length > 0 ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {appointments.map((appointment, index) => (
               <Card key={index} className="overflow-hidden">
-                <div className={`w-2 h-full absolute ${getAppointmentStatusColor(appointment.status)}`}></div>
-                <CardContent className="p-6 pl-8">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold">{appointment.type}</h3>
-                      <p className="text-gray-500">{appointment.doctor}</p>
-                    </div>
-                    <div className="mt-2 md:mt-0 flex flex-col md:items-end">
-                      <div className="flex items-center text-gray-700">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        <span>{new Date(appointment.date).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center text-gray-700">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>{appointment.time}</span>
-                      </div>
-                      <div className="flex items-center text-gray-700">
-                        <MapPin className="mr-2 h-4 w-4" />
-                        <span>{appointment.location}</span>
-                      </div>
-                    </div>
+                <div className={`h-2 ${appointment.status === 'confirmed' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">{appointment.type}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">{appointment.date}</span>
                   </div>
-                  <div className="mt-4 flex justify-end space-x-2">
-                    <Button variant="outline" size="sm">Reschedule</Button>
-                    <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">Cancel</Button>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">{appointment.time}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="flex-1">Reschedule</Button>
+                    <Button variant="outline" size="sm" className="flex-1">Cancel</Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <p className="text-gray-500">No appointments scheduled</p>
-              <Button className="mt-4">Schedule an Appointment</Button>
-            </CardContent>
-          </Card>
+          <div className="text-center py-10 bg-white rounded-lg shadow-sm">
+            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-1">No Appointments</h3>
+            <p className="text-gray-500 mb-4">You don't have any upcoming appointments</p>
+            <Button>Schedule an Appointment</Button>
+          </div>
         )}
       </main>
     </div>
   );
-}
-
-function getAppointmentStatusColor(status) {
-  switch (status) {
-    case 'confirmed':
-      return 'bg-green-500';
-    case 'pending':
-      return 'bg-yellow-500';
-    case 'cancelled':
-      return 'bg-red-500';
-    default:
-      return 'bg-blue-500';
-  }
 }

@@ -6,99 +6,36 @@ import {
   Calendar, 
   MessageSquare, 
   User, 
-  Home,
-  Menu,
-  X
+  Home 
 } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
 
 export function Navigation() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const navItems = [
-    { name: "Dashboard", href: "/", icon: Home },
-    { name: "Appointments", href: "/appointments", icon: Calendar },
-    { name: "Messages", href: "/messages", icon: MessageSquare },
-    { name: "Profile", href: "/profile", icon: User },
-  ];
+  
+  const isActive = (path) => {
+    return pathname === path;
+  };
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-blue-600 font-bold text-xl">HealthLink</span>
-            </Link>
-          </div>
-          
-          {/* Desktop navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors",
-                    pathname === item.href
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  )}
-                >
-                  <Icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </div>
-          
-          {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-            >
-              <span className="sr-only">Open main menu</span>
-              {mobileMenuOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
-              ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </div>
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 md:relative md:border-t-0 md:border-r md:h-screen md:w-64 md:py-6">
+      <div className="flex justify-around md:flex-col md:items-start md:gap-2 md:px-4">
+        <Link href="/" className={`flex items-center gap-2 p-2 rounded-md ${isActive('/') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}>
+          <Home size={20} />
+          <span className="hidden md:inline">Dashboard</span>
+        </Link>
+        <Link href="/appointments" className={`flex items-center gap-2 p-2 rounded-md ${isActive('/appointments') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}>
+          <Calendar size={20} />
+          <span className="hidden md:inline">Appointments</span>
+        </Link>
+        <Link href="/messages" className={`flex items-center gap-2 p-2 rounded-md ${isActive('/messages') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}>
+          <MessageSquare size={20} />
+          <span className="hidden md:inline">Messages</span>
+        </Link>
+        <Link href="/profile" className={`flex items-center gap-2 p-2 rounded-md ${isActive('/profile') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}>
+          <User size={20} />
+          <span className="hidden md:inline">Profile</span>
+        </Link>
       </div>
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="pt-2 pb-3 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center pl-3 pr-4 py-2 border-l-4 text-base font-medium",
-                    pathname === item.href
-                      ? "bg-blue-50 border-blue-500 text-blue-700"
-                      : "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Icon className="mr-4 h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

@@ -1,123 +1,116 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, User, Clock, ArrowRight } from "lucide-react";
+import { Calendar, MessageSquare, User, Clock } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function Home() {
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchAppointments = async () => {
       try {
-        const appointmentsResponse = await axios.get('/api/appointments');
-        setUpcomingAppointments(appointmentsResponse.data.slice(0, 2));
-        setUnreadMessages(3); // Mock data for unread messages
+        const response = await axios.get('/api/appointments');
+        setAppointments(response.data.slice(0, 3)); // Get only the first 3 appointments
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+        setError("Failed to load appointments");
         setLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchAppointments();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Patient Dashboard</h1>
-          <p className="mt-2 text-gray-600">Welcome to your HealthLink patient portal</p>
-        </div>
+      <main className="flex-1 p-4 md:p-8 md:ml-64">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">HealthLink Patient Portal</h1>
+          <p className="text-gray-600 mt-2">Manage your healthcare communications in one place</p>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Upcoming Appointments Card */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xl font-bold">Upcoming Appointments</CardTitle>
-              <Calendar className="h-5 w-5 text-blue-500" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-blue-500" />
+                Upcoming Appointments
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="animate-pulse space-y-3">
-                  <div className="h-12 bg-gray-200 rounded"></div>
-                  <div className="h-12 bg-gray-200 rounded"></div>
-                </div>
-              ) : upcomingAppointments.length > 0 ? (
-                <div className="space-y-4">
-                  {upcomingAppointments.map((appointment, index) => (
-                    <div key={index} className="flex items-center justify-between border-b pb-3 last:border-0">
-                      <div>
-                        <p className="font-medium">{appointment.type}</p>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Clock className="mr-1 h-3 w-3" />
-                          <span>{new Date(appointment.date).toLocaleDateString()} at {appointment.time}</span>
-                        </div>
+                <p className="text-sm text-gray-500">Loading appointments...</p>
+              ) : error ? (
+                <p className="text-sm text-red-500">{error}</p>
+              ) : appointments.length > 0 ? (
+                <ul className="space-y-3">
+                  {appointments.map((appointment, index) => (
+                    <li key={index} className="flex items-start gap-3 border-b pb-2 last:border-0">
+                      <div className="bg-blue-100 p-2 rounded-md">
+                        <Clock className="h-4 w-4 text-blue-600" />
                       </div>
-                    </div>
+                      <div>
+                        <p className="font-medium text-sm">{appointment.type}</p>
+                        <p className="text-xs text-gray-500">{appointment.date}, {appointment.time}</p>
+                      </div>
+                    </li>
                   ))}
-                  <Link href="/appointments" className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                    View all appointments
-                    <ArrowRight className="ml-1 h-3 w-3" />
-                  </Link>
-                </div>
+                </ul>
               ) : (
-                <p className="text-gray-500">No upcoming appointments</p>
+                <p className="text-sm text-gray-500">No upcoming appointments</p>
               )}
+              <Button asChild variant="outline" className="w-full mt-4">
+                <Link href="/appointments">View All</Link>
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Messages Card */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xl font-bold">Messages</CardTitle>
-              <MessageSquare className="h-5 w-5 text-blue-500" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-green-500" />
+                Recent Messages
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="animate-pulse space-y-3">
-                  <div className="h-12 bg-gray-200 rounded"></div>
-                </div>
-              ) : (
-                <div>
-                  <div className="mb-4">
-                    <p className="font-medium">You have {unreadMessages} unread messages</p>
-                    <p className="text-sm text-gray-500">Check your inbox for updates from your healthcare provider</p>
-                  </div>
-                  <Link href="/messages">
-                    <Button className="w-full">View Messages</Button>
-                  </Link>
-                </div>
-              )}
+              <p className="text-sm text-gray-500 mb-4">You have 2 unread messages</p>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/messages">View Messages</Link>
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Profile Card */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xl font-bold">Your Profile</CardTitle>
-              <User className="h-5 w-5 text-blue-500" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <User className="h-5 w-5 text-purple-500" />
+                My Profile
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="mb-4">
-                <p className="font-medium">Keep your information up to date</p>
-                <p className="text-sm text-gray-500">Ensure your contact details and medical information are current</p>
-              </div>
-              <Link href="/profile">
-                <Button variant="outline" className="w-full">Manage Profile</Button>
-              </Link>
+              <p className="text-sm text-gray-500 mb-4">Update your personal information and preferences</p>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/profile">Manage Profile</Link>
+              </Button>
             </CardContent>
           </Card>
-        </div>
+        </section>
+
+        <section className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+          <h2 className="text-xl font-bold mb-2">Need assistance?</h2>
+          <p className="mb-4">Our support team is available 24/7 to help you with any questions.</p>
+          <Button variant="secondary">Contact Support</Button>
+        </section>
       </main>
     </div>
   );
