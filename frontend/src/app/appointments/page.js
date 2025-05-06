@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar as CalendarIcon, Clock, Plus } from "lucide-react";
+import { Calendar, Clock, AlertCircle } from "lucide-react";
 import axios from "axios";
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -18,8 +19,9 @@ export default function AppointmentsPage() {
         const response = await axios.get('/api/appointments');
         setAppointments(response.data);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+        setError("Could not load appointments");
         setLoading(false);
       }
     };
@@ -27,101 +29,114 @@ export default function AppointmentsPage() {
     fetchAppointments();
   }, []);
 
-  // Filter appointments by status
-  const upcomingAppointments = appointments.filter(app => new Date(app.date) >= new Date());
-  const pastAppointments = appointments.filter(app => new Date(app.date) < new Date());
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Appointment
-            </Button>
-          </div>
-
-          <Tabs defaultValue="upcoming" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-              <TabsTrigger value="past">Past</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="upcoming">
-              {loading ? (
-                <div className="text-center py-10">Loading appointments...</div>
-              ) : upcomingAppointments.length > 0 ? (
-                <div className="grid gap-4">
-                  {upcomingAppointments.map((appointment, index) => (
-                    <AppointmentCard key={index} appointment={appointment} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-10">
-                  <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No upcoming appointments</h3>
-                  <p className="mt-1 text-sm text-gray-500">Schedule a new appointment to get started.</p>
-                  <div className="mt-6">
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      New Appointment
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="past">
-              {loading ? (
-                <div className="text-center py-10">Loading appointments...</div>
-              ) : pastAppointments.length > 0 ? (
-                <div className="grid gap-4">
-                  {pastAppointments.map((appointment, index) => (
-                    <AppointmentCard key={index} appointment={appointment} isPast />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-10">
-                  <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No past appointments</h3>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-function AppointmentCard({ appointment, isPast = false }) {
-  return (
-    <Card className={isPast ? "opacity-75" : ""}>
-      <CardHeader className="pb-2">
-        <CardTitle>{appointment.type}</CardTitle>
-        <CardDescription>With Dr. {appointment.doctor}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center mb-2">
-          <CalendarIcon className="h-4 w-4 mr-2 text-blue-500" />
-          <span className="text-sm">{appointment.date}</span>
-        </div>
-        <div className="flex items-center">
-          <Clock className="h-4 w-4 mr-2 text-blue-500" />
-          <span className="text-sm">{appointment.time}</span>
-        </div>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">HealthLink</h1>
+          <p className="text-slate-600">Your patient communication portal</p>
+        </header>
         
-        {!isPast && (
-          <div className="mt-4 flex space-x-2">
-            <Button variant="outline" size="sm" className="flex-1">Reschedule</Button>
-            <Button variant="outline" size="sm" className="flex-1">Cancel</Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <Navigation />
+        
+        <Card>
+          <CardHeader className="bg-blue-50 border-b">
+            <CardTitle className="text-xl text-blue-700">Appointments</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <Tabs defaultValue="upcoming">
+              <TabsList className="mb-6">
+                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                <TabsTrigger value="past">Past</TabsTrigger>
+                <TabsTrigger value="all">All</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="upcoming">
+                {loading ? (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500">Loading appointments...</p>
+                  </div>
+                ) : error ? (
+                  <div className="flex items-center justify-center py-8 text-red-500">
+                    <AlertCircle className="h-5 w-5 mr-2" />
+                    <span>{error}</span>
+                  </div>
+                ) : appointments.length > 0 ? (
+                  <div className="space-y-4">
+                    {appointments.map((appointment, index) => (
+                      <div key={index} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
+                        <div className="flex items-start mb-4 md:mb-0">
+                          <div className="bg-blue-100 p-3 rounded-md mr-4">
+                            <Calendar className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-lg">{appointment.type}</h3>
+                            <p className="text-slate-500">{appointment.date} at {appointment.time}</p>
+                            <p className="text-slate-500">Dr. {appointment.doctor}</p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">Reschedule</Button>
+                          <Button variant="destructive" size="sm">Cancel</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500">No upcoming appointments</p>
+                    <Button className="mt-4">Schedule New Appointment</Button>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="past">
+                <div className="text-center py-8">
+                  <p className="text-slate-500">No past appointments</p>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="all">
+                {loading ? (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500">Loading appointments...</p>
+                  </div>
+                ) : error ? (
+                  <div className="flex items-center justify-center py-8 text-red-500">
+                    <AlertCircle className="h-5 w-5 mr-2" />
+                    <span>{error}</span>
+                  </div>
+                ) : appointments.length > 0 ? (
+                  <div className="space-y-4">
+                    {appointments.map((appointment, index) => (
+                      <div key={index} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
+                        <div className="flex items-start mb-4 md:mb-0">
+                          <div className="bg-blue-100 p-3 rounded-md mr-4">
+                            <Calendar className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-lg">{appointment.type}</h3>
+                            <p className="text-slate-500">{appointment.date} at {appointment.time}</p>
+                            <p className="text-slate-500">Dr. {appointment.doctor}</p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">Details</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500">No appointments found</p>
+                    <Button className="mt-4">Schedule New Appointment</Button>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

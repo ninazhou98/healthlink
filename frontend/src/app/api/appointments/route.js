@@ -1,46 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 // Mock data for appointments
 const mockAppointments = [
   {
     id: 1,
     type: "Annual Physical",
-    doctor: "Sarah Johnson",
-    date: "2023-06-15",
+    date: "May 15, 2023",
     time: "10:00 AM",
+    doctor: "Sarah Johnson",
     status: "confirmed"
   },
   {
     id: 2,
-    type: "Cardiology Follow-up",
-    doctor: "Michael Chen",
-    date: "2023-06-22",
+    type: "Dental Cleaning",
+    date: "May 22, 2023",
     time: "2:30 PM",
+    doctor: "Michael Chen",
     status: "confirmed"
   },
   {
     id: 3,
-    type: "Dental Cleaning",
-    doctor: "Emily Rodriguez",
-    date: "2023-07-05",
-    time: "9:15 AM",
-    status: "confirmed"
-  },
-  {
-    id: 4,
-    type: "Dermatology Consultation",
-    doctor: "David Kim",
-    date: "2023-05-10",
-    time: "11:30 AM",
-    status: "completed"
-  },
-  {
-    id: 5,
     type: "Eye Examination",
-    doctor: "Lisa Wong",
-    date: "2023-04-20",
-    time: "3:45 PM",
-    status: "completed"
+    date: "June 5, 2023",
+    time: "9:15 AM",
+    doctor: "Robert Williams",
+    status: "pending"
   }
 ];
 
@@ -54,12 +38,12 @@ export async function GET() {
     // });
     // const data = await response.json();
     
-    // For demo purposes, we're using mock data
+    // For now, return mock data
     return NextResponse.json(mockAppointments);
   } catch (error) {
-    console.error('Error fetching appointments:', error);
+    console.error("Error fetching appointments:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch appointments' },
+      { error: "Failed to fetch appointments" },
       { status: 500 }
     );
   }

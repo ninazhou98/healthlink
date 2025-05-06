@@ -1,201 +1,298 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import axios from "axios";
+import { User, Lock, FileText, Bell } from "lucide-react";
 
 export default function ProfilePage() {
-  const [patient, setPatient] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phone: "(555) 123-4567",
+    dateOfBirth: "1985-06-15",
+    address: "123 Main St",
+    city: "Anytown",
+    state: "CA",
+    zipCode: "12345"
+  });
 
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      try {
-        const response = await axios.get('/api/patients');
-        // For demo purposes, just use the first patient
-        setPatient(response.data[0]);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching patient data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchPatientData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0 text-center">
-            Loading profile...
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const handlePersonalInfoChange = (e) => {
+    setPersonalInfo({
+      ...personalInfo,
+      [e.target.name]: e.target.value
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">My Profile</h1>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Profile Summary Card */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <div className="flex flex-col items-center">
-                  <Avatar className="h-24 w-24 mb-4">
-                    <AvatarFallback>{patient?.firstName?.charAt(0)}{patient?.lastName?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <CardTitle>{patient?.firstName} {patient?.lastName}</CardTitle>
-                  <CardDescription>Patient ID: {patient?.patientId}</CardDescription>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">HealthLink</h1>
+          <p className="text-slate-600">Your patient communication portal</p>
+        </header>
+        
+        <Navigation />
+        
+        <Card>
+          <CardHeader className="bg-slate-50 border-b">
+            <CardTitle className="text-xl text-slate-800">Patient Profile</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <Tabs defaultValue="personal">
+              <TabsList className="mb-6">
+                <TabsTrigger value="personal" className="flex items-center">
+                  <User className="h-4 w-4 mr-2" />
+                  Personal Info
+                </TabsTrigger>
+                <TabsTrigger value="medical" className="flex items-center">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Medical History
+                </TabsTrigger>
+                <TabsTrigger value="security" className="flex items-center">
+                  <Lock className="h-4 w-4 mr-2" />
+                  Security
+                </TabsTrigger>
+                <TabsTrigger value="notifications" className="flex items-center">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="personal">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input 
+                      id="firstName" 
+                      name="firstName" 
+                      value={personalInfo.firstName} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input 
+                      id="lastName" 
+                      name="lastName" 
+                      value={personalInfo.lastName} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      name="email" 
+                      type="email" 
+                      value={personalInfo.email} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input 
+                      id="phone" 
+                      name="phone" 
+                      value={personalInfo.phone} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                    <Input 
+                      id="dateOfBirth" 
+                      name="dateOfBirth" 
+                      type="date" 
+                      value={personalInfo.dateOfBirth} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input 
+                      id="address" 
+                      name="address" 
+                      value={personalInfo.address} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input 
+                      id="city" 
+                      name="city" 
+                      value={personalInfo.city} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input 
+                      id="state" 
+                      name="state" 
+                      value={personalInfo.state} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="zipCode">ZIP Code</Label>
+                    <Input 
+                      id="zipCode" 
+                      name="zipCode" 
+                      value={personalInfo.zipCode} 
+                      onChange={handlePersonalInfoChange} 
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+                
+                <div className="mt-6 flex justify-end">
+                  <Button>Save Changes</Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="medical">
+                <div className="space-y-6">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Date of Birth</p>
-                    <p>{patient?.dateOfBirth}</p>
+                    <h3 className="text-lg font-medium mb-3">Medical Conditions</h3>
+                    <div className="bg-white p-4 rounded-lg border border-slate-200">
+                      <p className="text-slate-500">No medical conditions on record.</p>
+                    </div>
                   </div>
+                  
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Email</p>
-                    <p>{patient?.email}</p>
+                    <h3 className="text-lg font-medium mb-3">Medications</h3>
+                    <div className="bg-white p-4 rounded-lg border border-slate-200">
+                      <ul className="space-y-2">
+                        <li className="flex justify-between">
+                          <span>Lisinopril 10mg</span>
+                          <span className="text-slate-500">Once daily</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Metformin 500mg</span>
+                          <span className="text-slate-500">Twice daily</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
+                  
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Phone</p>
-                    <p>{patient?.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Address</p>
-                    <p>{patient?.address}</p>
-                    <p>{patient?.city}, {patient?.state} {patient?.zipCode}</p>
+                    <h3 className="text-lg font-medium mb-3">Allergies</h3>
+                    <div className="bg-white p-4 rounded-lg border border-slate-200">
+                      <ul className="space-y-2">
+                        <li>Penicillin</li>
+                        <li>Peanuts</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">Edit Profile</Button>
-              </CardFooter>
-            </Card>
-
-            {/* Profile Details Tabs */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Profile Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="personal">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="personal">Personal</TabsTrigger>
-                    <TabsTrigger value="medical">Medical</TabsTrigger>
-                    <TabsTrigger value="insurance">Insurance</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="personal" className="mt-6">
+              </TabsContent>
+              
+              <TabsContent value="security">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Change Password</h3>
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name</Label>
-                          <Input id="firstName" defaultValue={patient?.firstName} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <Input id="lastName" defaultValue={patient?.lastName} />
-                        </div>
+                      <div>
+                        <Label htmlFor="currentPassword">Current Password</Label>
+                        <Input id="currentPassword" type="password" className="mt-1" />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" defaultValue={patient?.email} />
+                      <div>
+                        <Label htmlFor="newPassword">New Password</Label>
+                        <Input id="newPassword" type="password" className="mt-1" />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input id="phone" defaultValue={patient?.phone} />
+                      <div>
+                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                        <Input id="confirmPassword" type="password" className="mt-1" />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="address">Address</Label>
-                        <Input id="address" defaultValue={patient?.address} />
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="city">City</Label>
-                          <Input id="city" defaultValue={patient?.city} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="state">State</Label>
-                          <Input id="state" defaultValue={patient?.state} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="zipCode">Zip Code</Label>
-                          <Input id="zipCode" defaultValue={patient?.zipCode} />
-                        </div>
-                      </div>
-                      
-                      <Button>Save Changes</Button>
+                      <Button>Update Password</Button>
                     </div>
-                  </TabsContent>
+                  </div>
                   
-                  <TabsContent value="medical" className="mt-6">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="allergies">Allergies</Label>
-                        <Input id="allergies" defaultValue={patient?.allergies || 'None'} />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="medications">Current Medications</Label>
-                        <Input id="medications" defaultValue={patient?.medications || 'None'} />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="conditions">Medical Conditions</Label>
-                        <Input id="conditions" defaultValue={patient?.conditions || 'None'} />
-                      </div>
-                      
-                      <Button>Save Changes</Button>
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Two-Factor Authentication</h3>
+                    <div className="bg-white p-4 rounded-lg border border-slate-200">
+                      <p className="mb-4">Enhance your account security by enabling two-factor authentication.</p>
+                      <Button variant="outline">Enable 2FA</Button>
                     </div>
-                  </TabsContent>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <div className="space-y-6">
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="font-medium">Appointment Reminders</h3>
+                        <p className="text-sm text-slate-500">Receive notifications about upcoming appointments</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="appointmentEmail" className="text-sm">Email</Label>
+                        <Input id="appointmentEmail" type="checkbox" className="h-4 w-4" defaultChecked />
+                        <Label htmlFor="appointmentSMS" className="text-sm">SMS</Label>
+                        <Input id="appointmentSMS" type="checkbox" className="h-4 w-4" defaultChecked />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="font-medium">Medication Reminders</h3>
+                        <p className="text-sm text-slate-500">Receive reminders to take your medication</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="medicationEmail" className="text-sm">Email</Label>
+                        <Input id="medicationEmail" type="checkbox" className="h-4 w-4" />
+                        <Label htmlFor="medicationSMS" className="text-sm">SMS</Label>
+                        <Input id="medicationSMS" type="checkbox" className="h-4 w-4" defaultChecked />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">New Messages</h3>
+                        <p className="text-sm text-slate-500">Get notified when you receive new messages</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="messagesEmail" className="text-sm">Email</Label>
+                        <Input id="messagesEmail" type="checkbox" className="h-4 w-4" defaultChecked />
+                        <Label htmlFor="messagesSMS" className="text-sm">SMS</Label>
+                        <Input id="messagesSMS" type="checkbox" className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </div>
                   
-                  <TabsContent value="insurance" className="mt-6">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                        <Input id="insuranceProvider" defaultValue={patient?.insuranceProvider || ''} />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="policyNumber">Policy Number</Label>
-                        <Input id="policyNumber" defaultValue={patient?.policyNumber || ''} />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="groupNumber">Group Number</Label>
-                        <Input id="groupNumber" defaultValue={patient?.groupNumber || ''} />
-                      </div>
-                      
-                      <Button>Save Changes</Button>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
+                  <div className="mt-6 flex justify-end">
+                    <Button>Save Preferences</Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

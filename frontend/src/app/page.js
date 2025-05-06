@@ -4,132 +4,142 @@ import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, User, Clock, ArrowRight } from "lucide-react";
+import { Calendar, MessageSquare, Clock, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 
 export default function Home() {
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAppointments = async () => {
       try {
         const response = await axios.get('/api/appointments');
-        // Filter to show only upcoming appointments (next 3)
-        const upcoming = response.data.slice(0, 3);
-        setUpcomingAppointments(upcoming);
-        setUnreadMessages(4); // Mock data for unread messages
+        setAppointments(response.data.slice(0, 3)); // Get only the first 3 appointments
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+        setError("Could not load appointments");
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchAppointments();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Welcome to HealthLink</h1>
-            <p className="mt-2 text-lg text-gray-600">Your secure patient communication portal</p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Quick Actions Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common tasks you might want to do</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full justify-start" variant="outline">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Schedule Appointment
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Send Message
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <User className="mr-2 h-4 w-4" />
-                  Update Profile
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Upcoming Appointments Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Appointments</CardTitle>
-                <CardDescription>Your scheduled visits</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <p className="text-center py-4">Loading appointments...</p>
-                ) : upcomingAppointments.length > 0 ? (
-                  <ul className="space-y-3">
-                    {upcomingAppointments.map((appointment, index) => (
-                      <li key={index} className="flex items-start p-3 border rounded-md">
-                        <div className="bg-blue-100 p-2 rounded-md mr-3">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{appointment.type}</p>
-                          <p className="text-sm text-gray-500">{appointment.date} at {appointment.time}</p>
-                          <p className="text-sm text-gray-500">Dr. {appointment.doctor}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-center py-4">No upcoming appointments</p>
-                )}
-              </CardContent>
-              <CardFooter>
-                <Link href="/appointments" className="w-full">
-                  <Button variant="outline" className="w-full">
-                    View All Appointments
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-
-            {/* Messages Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Messages</CardTitle>
-                <CardDescription>Your secure communications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-4">
-                  <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-3">
-                    <MessageSquare className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-medium">You have {unreadMessages} unread messages</h3>
-                  <p className="text-sm text-gray-500 mt-1">Stay in touch with your healthcare team</p>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">HealthLink</h1>
+          <p className="text-slate-600">Your patient communication portal</p>
+        </header>
+        
+        <Navigation />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card>
+            <CardHeader className="bg-blue-50 border-b">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg text-blue-700">Upcoming Appointments</CardTitle>
+                <Calendar className="h-5 w-5 text-blue-600" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {loading ? (
+                <p className="text-center py-4 text-slate-500">Loading appointments...</p>
+              ) : error ? (
+                <div className="flex items-center justify-center py-4 text-red-500">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  <span>{error}</span>
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Link href="/messages" className="w-full">
-                  <Button variant="outline" className="w-full">
-                    View Messages
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          </div>
+              ) : appointments.length > 0 ? (
+                <ul className="space-y-4">
+                  {appointments.map((appointment, index) => (
+                    <li key={index} className="flex items-start p-3 rounded-lg bg-white border border-slate-200">
+                      <div className="bg-blue-100 p-2 rounded-md mr-3">
+                        <Clock className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{appointment.type}</p>
+                        <p className="text-sm text-slate-500">{appointment.date} at {appointment.time}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center py-4 text-slate-500">No upcoming appointments</p>
+              )}
+            </CardContent>
+            <CardFooter className="bg-slate-50 border-t">
+              <Link href="/appointments" className="w-full">
+                <Button variant="outline" className="w-full">View All Appointments</Button>
+              </Link>
+            </CardFooter>
+          </Card>
+          
+          <Card>
+            <CardHeader className="bg-green-50 border-b">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg text-green-700">Recent Messages</CardTitle>
+                <MessageSquare className="h-5 w-5 text-green-600" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <ul className="space-y-4">
+                <li className="flex items-start p-3 rounded-lg bg-white border border-slate-200">
+                  <div className="bg-green-100 p-2 rounded-md mr-3">
+                    <MessageSquare className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Dr. Sarah Johnson</p>
+                    <p className="text-sm text-slate-500">Your lab results are ready for review</p>
+                  </div>
+                </li>
+                <li className="flex items-start p-3 rounded-lg bg-white border border-slate-200">
+                  <div className="bg-green-100 p-2 rounded-md mr-3">
+                    <MessageSquare className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Appointment Reminder</p>
+                    <p className="text-sm text-slate-500">Your appointment is scheduled for tomorrow</p>
+                  </div>
+                </li>
+              </ul>
+            </CardContent>
+            <CardFooter className="bg-slate-50 border-t">
+              <Link href="/messages" className="w-full">
+                <Button variant="outline" className="w-full">View All Messages</Button>
+              </Link>
+            </CardFooter>
+          </Card>
         </div>
-      </main>
+        
+        <Card className="mb-8">
+          <CardHeader className="bg-purple-50 border-b">
+            <CardTitle className="text-lg text-purple-700">Health Tips</CardTitle>
+            <CardDescription className="text-purple-500">Stay healthy with these tips</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-white rounded-lg border border-slate-200">
+                <h3 className="font-medium mb-2">Stay Hydrated</h3>
+                <p className="text-sm text-slate-600">Drink at least 8 glasses of water daily to maintain good health.</p>
+              </div>
+              <div className="p-4 bg-white rounded-lg border border-slate-200">
+                <h3 className="font-medium mb-2">Regular Exercise</h3>
+                <p className="text-sm text-slate-600">Aim for at least 30 minutes of moderate activity each day.</p>
+              </div>
+              <div className="p-4 bg-white rounded-lg border border-slate-200">
+                <h3 className="font-medium mb-2">Balanced Diet</h3>
+                <p className="text-sm text-slate-600">Include fruits, vegetables, and whole grains in your daily meals.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

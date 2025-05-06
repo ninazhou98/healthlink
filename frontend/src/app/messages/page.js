@@ -1,201 +1,122 @@
 "use client";
 
-import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Plus } from "lucide-react";
+import { MessageSquare, Send, User } from "lucide-react";
 
 export default function MessagesPage() {
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [newMessage, setNewMessage] = useState("");
-  
-  // Mock data for conversations
-  const conversations = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      role: "Primary Care",
-      avatar: null,
-      lastMessage: "Your test results look good. Let's discuss at your next appointment.",
-      unread: true,
-      messages: [
-        { id: 1, sender: "doctor", content: "Hello! How are you feeling today?", time: "9:30 AM" },
-        { id: 2, sender: "patient", content: "Much better, thank you. The medication is helping.", time: "9:45 AM" },
-        { id: 3, sender: "doctor", content: "That's great to hear! Your test results look good. Let's discuss at your next appointment.", time: "10:15 AM" },
-      ]
-    },
-    {
-      id: 2,
-      name: "Dr. Michael Chen",
-      role: "Cardiologist",
-      avatar: null,
-      lastMessage: "Remember to take your blood pressure readings daily.",
-      unread: false,
-      messages: [
-        { id: 1, sender: "doctor", content: "How's your blood pressure been this week?", time: "Yesterday" },
-        { id: 2, sender: "patient", content: "It's been stable, averaging around 120/80.", time: "Yesterday" },
-        { id: 3, sender: "doctor", content: "Remember to take your blood pressure readings daily.", time: "Yesterday" },
-      ]
-    },
-    {
-      id: 3,
-      name: "Nurse Williams",
-      role: "Office Nurse",
-      avatar: null,
-      lastMessage: "Your prescription refill has been approved.",
-      unread: true,
-      messages: [
-        { id: 1, sender: "nurse", content: "Your prescription refill has been approved.", time: "2 days ago" },
-      ]
-    }
-  ];
-
-  const handleSendMessage = () => {
-    if (newMessage.trim() === "" || !selectedConversation) return;
-    
-    // In a real app, you would send this to an API
-    console.log("Sending message:", newMessage, "to conversation:", selectedConversation);
-    
-    // Clear the input
-    setNewMessage("");
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Message
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Conversations List */}
-            <Card className="md:col-span-1">
-              <CardHeader>
-                <CardTitle>Conversations</CardTitle>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">HealthLink</h1>
+          <p className="text-slate-600">Your patient communication portal</p>
+        </header>
+        
+        <Navigation />
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <Card>
+              <CardHeader className="bg-green-50 border-b">
+                <CardTitle className="text-lg text-green-700">Conversations</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y">
-                  {conversations.map((conversation) => (
-                    <div 
-                      key={conversation.id}
-                      className={`p-4 cursor-pointer hover:bg-gray-50 ${selectedConversation === conversation.id ? 'bg-blue-50' : ''}`}
-                      onClick={() => setSelectedConversation(conversation.id)}
-                    >
-                      <div className="flex items-start">
-                        <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={conversation.avatar} alt={conversation.name} />
-                          <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium truncate">{conversation.name}</p>
-                            {conversation.unread && (
-                              <span className="inline-block h-2 w-2 bg-blue-600 rounded-full"></span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-500">{conversation.role}</p>
-                          <p className="text-sm truncate mt-1">{conversation.lastMessage}</p>
-                        </div>
-                      </div>
+                  <button className="w-full flex items-center p-4 hover:bg-slate-50 transition-colors bg-white">
+                    <div className="bg-green-100 p-2 rounded-full mr-3">
+                      <User className="h-5 w-5 text-green-600" />
                     </div>
-                  ))}
+                    <div className="text-left">
+                      <p className="font-medium">Dr. Sarah Johnson</p>
+                      <p className="text-sm text-slate-500 truncate">Your lab results are ready for review</p>
+                    </div>
+                  </button>
+                  
+                  <button className="w-full flex items-center p-4 hover:bg-slate-50 transition-colors bg-slate-100">
+                    <div className="bg-green-100 p-2 rounded-full mr-3">
+                      <User className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium">Dr. Michael Chen</p>
+                      <p className="text-sm text-slate-500 truncate">Follow-up on your recent visit</p>
+                    </div>
+                  </button>
+                  
+                  <button className="w-full flex items-center p-4 hover:bg-slate-50 transition-colors">
+                    <div className="bg-green-100 p-2 rounded-full mr-3">
+                      <User className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium">Appointment Reminders</p>
+                      <p className="text-sm text-slate-500 truncate">Your appointment is scheduled for tomorrow</p>
+                    </div>
+                  </button>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Message Thread */}
-            <Card className="md:col-span-2">
-              <CardHeader className="border-b">
-                {selectedConversation ? (
-                  <div className="flex items-center">
-                    <Avatar className="h-8 w-8 mr-2">
-                      <AvatarFallback>
-                        {conversations.find(c => c.id === selectedConversation)?.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-base">
-                        {conversations.find(c => c.id === selectedConversation)?.name}
-                      </CardTitle>
-                      <p className="text-xs text-gray-500">
-                        {conversations.find(c => c.id === selectedConversation)?.role}
-                      </p>
-                    </div>
+          </div>
+          
+          <div className="md:col-span-2">
+            <Card className="h-full flex flex-col">
+              <CardHeader className="bg-green-50 border-b">
+                <div className="flex items-center">
+                  <div className="bg-green-100 p-2 rounded-full mr-3">
+                    <User className="h-5 w-5 text-green-600" />
                   </div>
-                ) : (
-                  <CardTitle>Select a conversation</CardTitle>
-                )}
+                  <CardTitle className="text-lg text-green-700">Dr. Michael Chen</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent className="p-0">
-                {selectedConversation ? (
-                  <div className="flex flex-col h-[400px]">
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                      {conversations
-                        .find(c => c.id === selectedConversation)
-                        ?.messages.map((message) => (
-                          <div 
-                            key={message.id} 
-                            className={`flex ${message.sender === 'patient' ? 'justify-end' : 'justify-start'}`}
-                          >
-                            <div 
-                              className={`max-w-[80%] rounded-lg p-3 ${
-                                message.sender === 'patient' 
-                                  ? 'bg-blue-600 text-white' 
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              <p>{message.content}</p>
-                              <p className={`text-xs mt-1 ${
-                                message.sender === 'patient' ? 'text-blue-100' : 'text-gray-500'
-                              }`}>
-                                {message.time}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      }
-                    </div>
-                    <div className="border-t p-4">
-                      <div className="flex space-x-2">
-                        <Textarea 
-                          placeholder="Type your message..." 
-                          className="flex-1"
-                          value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendMessage();
-                            }
-                          }}
-                        />
-                        <Button onClick={handleSendMessage}>
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      </div>
+              
+              <CardContent className="flex-grow overflow-y-auto p-4">
+                <div className="space-y-4">
+                  <div className="flex justify-start">
+                    <div className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                      <p className="text-sm font-medium text-slate-900">Dr. Michael Chen</p>
+                      <p className="text-slate-700">Hello! How are you feeling after our last appointment?</p>
+                      <p className="text-xs text-slate-500 mt-1">10:30 AM</p>
                     </div>
                   </div>
-                ) : (
-                  <div className="h-[400px] flex items-center justify-center text-gray-500">
-                    Select a conversation to view messages
+                  
+                  <div className="flex justify-end">
+                    <div className="bg-blue-50 p-3 rounded-lg shadow-sm max-w-[80%]">
+                      <p className="text-slate-700">I'm feeling much better, thank you! The medication has been helping.</p>
+                      <p className="text-xs text-slate-500 mt-1">10:45 AM</p>
+                    </div>
                   </div>
-                )}
+                  
+                  <div className="flex justify-start">
+                    <div className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                      <p className="text-sm font-medium text-slate-900">Dr. Michael Chen</p>
+                      <p className="text-slate-700">That's great to hear! Any side effects from the medication?</p>
+                      <p className="text-xs text-slate-500 mt-1">11:00 AM</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <div className="bg-blue-50 p-3 rounded-lg shadow-sm max-w-[80%]">
+                      <p className="text-slate-700">No side effects so far. When should I schedule my follow-up?</p>
+                      <p className="text-xs text-slate-500 mt-1">11:15 AM</p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
+              
+              <div className="p-4 border-t bg-white">
+                <div className="flex space-x-2">
+                  <Textarea placeholder="Type your message..." className="min-h-[60px]" />
+                  <Button size="icon" className="h-[60px] w-[60px] bg-green-600 hover:bg-green-700">
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
             </Card>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
