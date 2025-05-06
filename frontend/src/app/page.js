@@ -1,145 +1,159 @@
 "use client";
 
-import { Navigation } from "@/components/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, User, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { Navigation } from "@/components/navigation";
+import { Calendar, MessageSquare, Bell, User } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
-  const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const response = await axios.get('/api/appointments');
-        // Only show the next 3 appointments
-        setAppointments(response.data.slice(0, 3));
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
+  // Mock data for the dashboard
+  const upcomingAppointments = [
+    { id: 1, date: "May 15, 2023", time: "10:00 AM", doctor: "Dr. Smith", type: "Check-up" },
+    { id: 2, date: "May 22, 2023", time: "2:30 PM", doctor: "Dr. Johnson", type: "Follow-up" }
+  ];
+  
+  const recentMessages = [
+    { id: 1, from: "Dr. Smith", preview: "Your test results are ready...", time: "2 hours ago" },
+    { id: 2, from: "Nurse Williams", preview: "Reminder about your medication...", time: "Yesterday" }
+  ];
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Navigation />
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 py-4">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-600">HealthLink</h1>
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon">
+              <Bell size={20} />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <User size={20} />
+            </Button>
+          </div>
+        </div>
+      </header>
       
-      <main className="flex-1 p-6 md:p-8">
-        <div className="max-w-5xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">Welcome to HealthLink</h1>
-            <p className="text-slate-500 mt-2">Your healthcare communication portal</p>
-          </header>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-1">
+        <aside className="hidden md:block w-64 border-r border-gray-200">
+          <Navigation />
+        </aside>
+        
+        <main className="flex-1 p-4 md:p-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome, Sarah</h2>
+            <p className="text-gray-600">Here's what's happening with your health</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <Calendar className="mr-2 h-5 w-5 text-blue-500" />
                   Upcoming Appointments
                 </CardTitle>
-                <CardDescription>Your scheduled appointments</CardDescription>
               </CardHeader>
               <CardContent>
-                {loading ? (
-                  <div className="flex justify-center py-4">
-                    <div className="animate-pulse flex space-x-4">
-                      <div className="flex-1 space-y-4 py-1">
-                        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-slate-200 rounded"></div>
-                        <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                {upcomingAppointments.map(appointment => (
+                  <div key={appointment.id} className="mb-3 pb-3 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0">
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-medium">{appointment.doctor}</p>
+                        <p className="text-sm text-gray-500">{appointment.type}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{appointment.date}</p>
+                        <p className="text-sm text-gray-500">{appointment.time}</p>
                       </div>
                     </div>
                   </div>
-                ) : appointments.length > 0 ? (
-                  <ul className="space-y-3">
-                    {appointments.map((appointment, index) => (
-                      <li key={index} className="flex items-start gap-3 p-3 rounded-md bg-slate-50">
-                        <div className="bg-blue-100 p-2 rounded-md">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{appointment.type}</p>
-                          <p className="text-sm text-slate-500">{appointment.date} at {appointment.time}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-center py-4 text-slate-500">No upcoming appointments</p>
-                )}
-                <div className="mt-4">
+                ))}
+                <Link href="/appointments">
+                  <Button variant="outline" className="w-full mt-2">View All Appointments</Button>
+                </Link>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <MessageSquare className="mr-2 h-5 w-5 text-blue-500" />
+                  Recent Messages
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recentMessages.map(message => (
+                  <div key={message.id} className="mb-3 pb-3 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0">
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-medium">{message.from}</p>
+                        <p className="text-sm text-gray-500 truncate">{message.preview}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">{message.time}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <Link href="/messages">
+                  <Button variant="outline" className="w-full mt-2">View All Messages</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="bg-blue-100 text-blue-600 rounded-full p-3 inline-flex mb-4">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-medium mb-1">Schedule Appointment</h3>
+                  <p className="text-sm text-gray-500 mb-4">Book your next visit</p>
                   <Link href="/appointments">
-                    <Button variant="outline" className="w-full">View All Appointments</Button>
+                    <Button variant="default" size="sm">Schedule Now</Button>
                   </Link>
                 </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-blue-600" />
-                  Messages
-                </CardTitle>
-                <CardDescription>Communicate with your healthcare provider</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 rounded-md bg-slate-50">
-                    <p className="font-medium">Have questions about your treatment?</p>
-                    <p className="text-sm text-slate-500">Send a secure message to your doctor</p>
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="bg-green-100 text-green-600 rounded-full p-3 inline-flex mb-4">
+                    <MessageSquare className="h-6 w-6" />
                   </div>
-                  <div className="p-3 rounded-md bg-slate-50">
-                    <p className="font-medium">Need prescription refills?</p>
-                    <p className="text-sm text-slate-500">Request medication refills through messaging</p>
-                  </div>
-                </div>
-                <div className="mt-4">
+                  <h3 className="font-medium mb-1">Message Provider</h3>
+                  <p className="text-sm text-gray-500 mb-4">Contact your healthcare team</p>
                   <Link href="/messages">
-                    <Button variant="outline" className="w-full">Go to Messages</Button>
+                    <Button variant="default" size="sm">Send Message</Button>
                   </Link>
                 </div>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-blue-600" />
-                  Your Profile
-                </CardTitle>
-                <CardDescription>Manage your personal information</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 rounded-md bg-slate-50">
-                    <p className="font-medium">Update contact information</p>
-                    <p className="text-sm text-slate-500">Keep your details current for better care</p>
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="bg-purple-100 text-purple-600 rounded-full p-3 inline-flex mb-4">
+                    <User className="h-6 w-6" />
                   </div>
-                  <div className="p-3 rounded-md bg-slate-50">
-                    <p className="font-medium">Health records access</p>
-                    <p className="text-sm text-slate-500">View your medical history and test results</p>
-                  </div>
-                </div>
-                <div className="mt-4">
+                  <h3 className="font-medium mb-1">Update Profile</h3>
+                  <p className="text-sm text-gray-500 mb-4">Manage your information</p>
                   <Link href="/profile">
-                    <Button variant="outline" className="w-full">View Profile</Button>
+                    <Button variant="default" size="sm">View Profile</Button>
                   </Link>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
+      
+      <div className="md:hidden">
+        <Navigation />
+      </div>
     </div>
   );
 }

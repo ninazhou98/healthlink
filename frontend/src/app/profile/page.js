@@ -1,246 +1,199 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProfilePage() {
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
-    const fetchPatientData = async () => {
+    async function fetchPatientData() {
       try {
-        const response = await axios.get('/api/patients');
-        setPatient(response.data[0]); // Just use the first patient for demo
+        const response = await fetch('/api/patients');
+        const data = await response.json();
+        // In a real app, we would fetch the specific patient
+        // For now, we'll use mock data
+        setPatient({
+          id: "123456",
+          name: "Sarah Johnson",
+          email: "sarah.johnson@example.com",
+          phone: "(555) 123-4567",
+          dob: "1985-06-15",
+          address: "123 Main St, Anytown, CA 12345",
+          insurance: {
+            provider: "Blue Cross Blue Shield",
+            policyNumber: "BCBS-12345678",
+            groupNumber: "GRP-987654"
+          },
+          emergencyContact: {
+            name: "Michael Johnson",
+            relationship: "Spouse",
+            phone: "(555) 987-6543"
+          }
+        });
         setLoading(false);
       } catch (error) {
         console.error('Error fetching patient data:', error);
         setLoading(false);
       }
-    };
-
+    }
+    
     fetchPatientData();
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Navigation />
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 py-4">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-600">HealthLink</h1>
+        </div>
+      </header>
       
-      <main className="flex-1 p-6 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">Your Profile</h1>
-            <p className="text-slate-500 mt-2">Manage your personal information and preferences</p>
-          </header>
-
-          {loading ? (
-            <div className="space-y-6">
-              <Card className="animate-pulse">
-                <CardHeader>
-                  <div className="h-7 bg-slate-200 rounded w-1/4 mb-2"></div>
-                  <div className="h-4 bg-slate-200 rounded w-1/3"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="h-10 bg-slate-200 rounded"></div>
-                    <div className="h-10 bg-slate-200 rounded"></div>
-                    <div className="h-10 bg-slate-200 rounded"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="personal">Personal Information</TabsTrigger>
-                <TabsTrigger value="medical">Medical History</TabsTrigger>
-                <TabsTrigger value="insurance">Insurance</TabsTrigger>
-                <TabsTrigger value="preferences">Preferences</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="personal">
+      <div className="flex flex-1">
+        <aside className="hidden md:block w-64 border-r border-gray-200">
+          <Navigation />
+        </aside>
+        
+        <main className="flex-1 p-4 md:p-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">My Profile</h2>
+            <p className="text-gray-600">Manage your personal information and preferences</p>
+          </div>
+          
+          {patient && (
+            <>
+              <div className="mb-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
-                    <CardDescription>Update your personal details</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name</Label>
-                          <Input id="firstName" defaultValue={patient?.firstName} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <Input id="lastName" defaultValue={patient?.lastName} />
-                        </div>
-                      </div>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                      <Avatar className="h-24 w-24">
+                        <AvatarFallback className="text-2xl">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" defaultValue={patient?.email} />
+                      <div className="flex-1 text-center md:text-left">
+                        <h3 className="text-xl font-bold">{patient.name}</h3>
+                        <p className="text-gray-500">Patient ID: {patient.id}</p>
+                        <div className="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
+                          <Button variant="outline" size="sm">Upload Photo</Button>
+                          <Button variant="outline" size="sm">Edit Profile</Button>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone Number</Label>
-                          <Input id="phone" defaultValue={patient?.phone} />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="address">Address</Label>
-                        <Input id="address" defaultValue={patient?.address} />
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="city">City</Label>
-                          <Input id="city" defaultValue={patient?.city} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="state">State</Label>
-                          <Input id="state" defaultValue={patient?.state} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="zipCode">Zip Code</Label>
-                          <Input id="zipCode" defaultValue={patient?.zipCode} />
-                        </div>
-                      </div>
-                      
-                      <div className="pt-4">
-                        <Button>Save Changes</Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="medical">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Medical History</CardTitle>
-                    <CardDescription>View and update your medical information</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-medium mb-2">Allergies</h3>
-                        <p className="text-slate-500">{patient?.allergies || "No known allergies"}</p>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-2">Current Medications</h3>
-                        <ul className="list-disc pl-5 text-slate-500">
-                          {patient?.medications?.length > 0 ? (
-                            patient.medications.map((med, index) => (
-                              <li key={index}>{med}</li>
-                            ))
-                          ) : (
-                            <li>No current medications</li>
-                          )}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-2">Medical Conditions</h3>
-                        <ul className="list-disc pl-5 text-slate-500">
-                          {patient?.conditions?.length > 0 ? (
-                            patient.conditions.map((condition, index) => (
-                              <li key={index}>{condition}</li>
-                            ))
-                          ) : (
-                            <li>No medical conditions on record</li>
-                          )}
-                        </ul>
-                      </div>
-                      
-                      <div className="pt-4">
-                        <Button>Request Medical Records Update</Button>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              </div>
               
-              <TabsContent value="insurance">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Insurance Information</CardTitle>
-                    <CardDescription>Manage your insurance details</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form className="space-y-4">
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="personal">Personal Information</TabsTrigger>
+                  <TabsTrigger value="insurance">Insurance</TabsTrigger>
+                  <TabsTrigger value="emergency">Emergency Contact</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="personal">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Personal Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                          <Input id="insuranceProvider" defaultValue={patient?.insurance?.provider} />
+                          <Label htmlFor="name">Full Name</Label>
+                          <Input id="name" value={patient.name} readOnly />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="policyNumber">Policy Number</Label>
-                          <Input id="policyNumber" defaultValue={patient?.insurance?.policyNumber} />
+                          <Label htmlFor="email">Email</Label>
+                          <Input id="email" type="email" value={patient.email} readOnly />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input id="phone" value={patient.phone} readOnly />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="dob">Date of Birth</Label>
+                          <Input id="dob" value={patient.dob} readOnly />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="address">Address</Label>
+                          <Input id="address" value={patient.address} readOnly />
                         </div>
                       </div>
-                      
+                      <div className="flex justify-end">
+                        <Button>Edit Information</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="insurance">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Insurance Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="groupNumber">Group Number</Label>
-                          <Input id="groupNumber" defaultValue={patient?.insurance?.groupNumber} />
+                          <Label htmlFor="provider">Insurance Provider</Label>
+                          <Input id="provider" value={patient.insurance.provider} readOnly />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="policyHolder">Policy Holder Name</Label>
-                          <Input id="policyHolder" defaultValue={patient?.insurance?.policyHolder} />
+                          <Label htmlFor="policy">Policy Number</Label>
+                          <Input id="policy" value={patient.insurance.policyNumber} readOnly />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="group">Group Number</Label>
+                          <Input id="group" value={patient.insurance.groupNumber} readOnly />
                         </div>
                       </div>
-                      
-                      <div className="pt-4">
-                        <Button>Update Insurance Information</Button>
+                      <div className="flex justify-end">
+                        <Button>Update Insurance</Button>
                       </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="preferences">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Communication Preferences</CardTitle>
-                    <CardDescription>Manage how you receive notifications and communications</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form className="space-y-6">
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="emailNotifications" className="h-4 w-4" defaultChecked />
-                        <Label htmlFor="emailNotifications">Email notifications for appointments</Label>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="emergency">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Emergency Contact</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="ec-name">Contact Name</Label>
+                          <Input id="ec-name" value={patient.emergencyContact.name} readOnly />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="relationship">Relationship</Label>
+                          <Input id="relationship" value={patient.emergencyContact.relationship} readOnly />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="ec-phone">Phone Number</Label>
+                          <Input id="ec-phone" value={patient.emergencyContact.phone} readOnly />
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="smsNotifications" className="h-4 w-4" defaultChecked />
-                        <Label htmlFor="smsNotifications">SMS reminders for appointments</Label>
+                      <div className="flex justify-end">
+                        <Button>Update Contact</Button>
                       </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="newsletterSubscription" className="h-4 w-4" />
-                        <Label htmlFor="newsletterSubscription">Subscribe to health newsletter</Label>
-                      </div>
-                      
-                      <div className="pt-4">
-                        <Button>Save Preferences</Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </>
           )}
-        </div>
-      </main>
+        </main>
+      </div>
+      
+      <div className="md:hidden">
+        <Navigation />
+      </div>
     </div>
   );
 }
