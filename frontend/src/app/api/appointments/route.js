@@ -2,23 +2,46 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // In a real app, you would fetch data from the Sikka API
-    // const response = await fetch('https://api.sikkasoft.com/v4/appointments', {
-    //   headers: {
-    //     'Authorization': `Bearer ${process.env.SIKKA_API_KEY}`
-    //   }
-    // });
-    // const data = await response.json();
+    // In a real application, this would fetch data from the Sikka API
+    // https://api.sikkasoft.com/v4/appointments
     
-    // For demo purposes, return mock data
-    const mockAppointments = [
-      { id: 1, date: "2023-05-15", time: "10:00 AM", doctor: "Dr. Smith", type: "Check-up", status: "upcoming" },
-      { id: 2, date: "2023-05-22", time: "2:30 PM", doctor: "Dr. Johnson", type: "Follow-up", status: "upcoming" },
-      { id: 3, date: "2023-04-10", time: "9:15 AM", doctor: "Dr. Williams", type: "Annual Physical", status: "past" },
-      { id: 4, date: "2023-03-05", time: "11:30 AM", doctor: "Dr. Brown", type: "Consultation", status: "past" }
+    // Mock data for demonstration
+    const appointments = [
+      {
+        id: "apt-001",
+        type: "Annual Physical",
+        doctor: "Johnson",
+        date: "May 15, 2023",
+        time: "10:00 AM",
+        status: "Confirmed"
+      },
+      {
+        id: "apt-002",
+        type: "Dental Cleaning",
+        doctor: "Martinez",
+        date: "May 22, 2023",
+        time: "2:30 PM",
+        status: "Confirmed"
+      },
+      {
+        id: "apt-003",
+        type: "Eye Examination",
+        doctor: "Williams",
+        date: "June 5, 2023",
+        time: "9:15 AM",
+        status: "Pending"
+      },
+      {
+        id: "apt-004",
+        type: "Follow-up Consultation",
+        doctor: "Johnson",
+        date: "June 12, 2023",
+        time: "11:45 AM",
+        status: "Confirmed"
+      }
     ];
-    
-    return NextResponse.json(mockAppointments);
+
+    return NextResponse.json(appointments);
   } catch (error) {
     console.error("Error fetching appointments:", error);
     return NextResponse.json(

@@ -2,185 +2,140 @@
 
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Send, Search } from "lucide-react";
+import { MessageSquare, Send, User } from "lucide-react";
 
 export default function MessagesPage() {
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [newMessage, setNewMessage] = useState("");
+  const [selectedConversation, setSelectedConversation] = useState(0);
   
-  // Mock conversations data
   const conversations = [
     {
-      id: 1,
-      name: "Dr. Smith",
+      name: "Dr. Johnson",
       role: "Primary Care",
-      lastMessage: "Your test results are ready",
+      lastMessage: "Your lab results look good. Let's discuss at your next appointment.",
       time: "10:30 AM",
       unread: true,
       messages: [
-        { id: 1, sender: "Dr. Smith", content: "Hello! I've reviewed your recent lab work.", time: "10:15 AM" },
-        { id: 2, sender: "Dr. Smith", content: "Your test results are ready. Everything looks good!", time: "10:30 AM" }
+        { sender: "Dr. Johnson", content: "Hello Sarah, I've reviewed your recent lab results.", time: "10:25 AM" },
+        { sender: "Dr. Johnson", content: "Your cholesterol levels have improved since last time.", time: "10:26 AM" },
+        { sender: "Dr. Johnson", content: "Your lab results look good. Let's discuss at your next appointment.", time: "10:30 AM" },
       ]
     },
     {
-      id: 2,
-      name: "Reception",
-      role: "Front Desk",
-      lastMessage: "Appointment confirmation",
+      name: "Nurse Williams",
+      role: "Cardiology",
+      lastMessage: "Your prescription refill has been approved.",
       time: "Yesterday",
       unread: false,
       messages: [
-        { id: 1, sender: "Reception", content: "Your appointment has been confirmed for May 15th at 10:00 AM.", time: "Yesterday" },
-        { id: 2, sender: "You", content: "Thank you! I'll be there.", time: "Yesterday" }
+        { sender: "Nurse Williams", content: "Hi Sarah, just following up on your prescription refill request.", time: "Yesterday" },
+        { sender: "Sarah", content: "Thank you for checking. I need it by this weekend.", time: "Yesterday" },
+        { sender: "Nurse Williams", content: "Your prescription refill has been approved.", time: "Yesterday" },
       ]
     },
     {
-      id: 3,
-      name: "Dr. Johnson",
-      role: "Specialist",
-      lastMessage: "Follow-up appointment",
-      time: "May 1",
+      name: "Dr. Martinez",
+      role: "Dermatology",
+      lastMessage: "Please apply the cream twice daily and avoid sun exposure.",
+      time: "Monday",
       unread: false,
       messages: [
-        { id: 1, sender: "Dr. Johnson", content: "I'd like to schedule a follow-up appointment to check your progress.", time: "May 1" },
-        { id: 2, sender: "You", content: "That sounds good. When would be a good time?", time: "May 1" },
-        { id: 3, sender: "Dr. Johnson", content: "How about next week? Tuesday or Thursday afternoon?", time: "May 1" }
+        { sender: "Dr. Martinez", content: "How is the new treatment working for your skin condition?", time: "Monday" },
+        { sender: "Sarah", content: "I'm seeing some improvement, but still have some redness.", time: "Monday" },
+        { sender: "Dr. Martinez", content: "Please apply the cream twice daily and avoid sun exposure.", time: "Monday" },
       ]
     }
   ];
 
-  const filteredConversations = conversations.filter(
-    conversation => conversation.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleSendMessage = () => {
-    if (newMessage.trim() === "" || !selectedConversation) return;
-    
-    // In a real app, you would send this to an API
-    console.log("Sending message:", newMessage, "to:", selectedConversation.name);
-    setNewMessage("");
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 py-4 px-6">
-        <h1 className="text-2xl font-bold text-blue-600">HealthLink</h1>
-        <p className="text-sm text-gray-500">Your healthcare connection</p>
-      </header>
-
-      <div className="flex flex-1">
-        <Navigation />
-        
-        <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
-          <h2 className="text-2xl font-semibold mb-6">Messages</h2>
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
+      <Navigation />
+      
+      <main className="flex-1 flex flex-col md:flex-row md:ml-64 h-screen">
+        <div className="w-full md:w-1/3 border-r border-gray-200 overflow-y-auto">
+          <div className="p-4 border-b">
+            <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
+            <p className="text-gray-600 text-sm mt-1">Communicate with your healthcare team</p>
+          </div>
           
-          <div className="flex h-[calc(100vh-220px)] border rounded-lg overflow-hidden bg-white">
-            {/* Conversations sidebar */}
-            <div className="w-full md:w-1/3 border-r">
-              <div className="p-3 border-b">
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                  <Input 
-                    placeholder="Search conversations" 
-                    className="pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="overflow-y-auto h-[calc(100%-56px)]">
-                {filteredConversations.map((conversation) => (
-                  <div 
-                    key={conversation.id}
-                    className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${selectedConversation?.id === conversation.id ? 'bg-blue-50' : ''}`}
-                    onClick={() => setSelectedConversation(conversation)}
-                  >
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">{conversation.name}</h3>
-                      <span className="text-xs text-gray-500">{conversation.time}</span>
+          <div className="divide-y">
+            {conversations.map((conversation, index) => (
+              <div 
+                key={index}
+                className={`p-4 cursor-pointer ${selectedConversation === index ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                onClick={() => setSelectedConversation(index)}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center">
+                    <div className="bg-blue-100 text-blue-700 p-2 rounded-full mr-3">
+                      <User size={20} />
                     </div>
-                    <p className="text-sm text-gray-600">{conversation.role}</p>
-                    <p className="text-sm text-gray-500 truncate mt-1">
-                      {conversation.lastMessage}
-                    </p>
-                    {conversation.unread && (
-                      <div className="mt-1 flex">
-                        <span className="bg-blue-500 rounded-full h-2 w-2"></span>
-                      </div>
-                    )}
+                    <div>
+                      <h3 className="font-medium flex items-center">
+                        {conversation.name}
+                        {conversation.unread && (
+                          <span className="ml-2 w-2 h-2 bg-blue-600 rounded-full"></span>
+                        )}
+                      </h3>
+                      <p className="text-xs text-gray-500">{conversation.role}</p>
+                    </div>
                   </div>
-                ))}
+                  <span className="text-xs text-gray-500">{conversation.time}</span>
+                </div>
+                <p className="text-sm text-gray-600 mt-2 line-clamp-1">{conversation.lastMessage}</p>
               </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="flex-1 flex flex-col h-full">
+          <div className="p-4 border-b flex items-center">
+            <div className="bg-blue-100 text-blue-700 p-2 rounded-full mr-3">
+              <User size={20} />
             </div>
-            
-            {/* Message content */}
-            <div className="hidden md:flex flex-col flex-1">
-              {selectedConversation ? (
-                <>
-                  <div className="p-4 border-b">
-                    <h3 className="font-medium">{selectedConversation.name}</h3>
-                    <p className="text-sm text-gray-600">{selectedConversation.role}</p>
-                  </div>
-                  
-                  <div className="flex-1 p-4 overflow-y-auto">
-                    {selectedConversation.messages.map((message) => (
-                      <div 
-                        key={message.id} 
-                        className={`mb-4 max-w-[80%] ${message.sender === "You" ? "ml-auto" : ""}`}
-                      >
-                        <div className={`p-3 rounded-lg ${
-                          message.sender === "You" 
-                            ? "bg-blue-500 text-white" 
-                            : "bg-gray-100"
-                        }`}>
-                          {message.content}
-                        </div>
-                        <div className={`text-xs mt-1 text-gray-500 ${
-                          message.sender === "You" ? "text-right" : ""
-                        }`}>
-                          {message.time}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="p-3 border-t">
-                    <div className="flex">
-                      <Textarea 
-                        placeholder="Type your message..." 
-                        className="resize-none"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSendMessage();
-                          }
-                        }}
-                      />
-                      <Button 
-                        className="ml-2 bg-blue-600 hover:bg-blue-700" 
-                        onClick={handleSendMessage}
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Select a conversation to start messaging
-                </div>
-              )}
+            <div>
+              <h2 className="font-medium">{conversations[selectedConversation].name}</h2>
+              <p className="text-xs text-gray-500">{conversations[selectedConversation].role}</p>
             </div>
           </div>
-        </main>
-      </div>
+          
+          <div className="flex-1 p-4 overflow-y-auto">
+            {conversations[selectedConversation].messages.map((message, index) => (
+              <div 
+                key={index} 
+                className={`mb-4 flex ${message.sender === 'Sarah' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div 
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    message.sender === 'Sarah' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  <p className={`text-xs mt-1 ${message.sender === 'Sarah' ? 'text-blue-100' : 'text-gray-500'}`}>
+                    {message.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="p-4 border-t">
+            <div className="flex items-center">
+              <Input 
+                placeholder="Type your message..." 
+                className="flex-1 mr-2"
+              />
+              <Button size="icon" className="bg-blue-600 hover:bg-blue-700">
+                <Send size={18} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
