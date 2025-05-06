@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  assetPrefix: '/apiplus_backend',
+  basePath: "/bc70ad5b-ab09-45bb-9bc1-5aa6bd854ad6",
+  assetPrefix: "/bc70ad5b-ab09-45bb-9bc1-5aa6bd854ad6",
 
   images: {
     remotePatterns: [
