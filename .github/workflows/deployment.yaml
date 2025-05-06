@@ -1,0 +1,137 @@
+name: Deploy to EC2
+on: 
+  workflow_dispatch:
+  push:
+      branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checking out the code and operations in the Github Ubuntu machine
+        env:
+          PEM_FILE: ${{ secrets.APIPLUS_EC2_SSH_KEY }}
+          IP_ADDR: ${{ vars.APIPLUS_EC2_IP_ADDR }}
+          CLIENT_ID: ${{ vars.CLIENT_ID }}
+          USER: "ec2-user"
+        run: |
+          # Prepare key
+          mkdir -p /tmp
+          echo "$PEM_FILE" > /tmp/key.pem
+          chmod 600 /tmp/key.pem
+          echo "Created the /tmp/key.pem"
+      
+          # Build folder path
+          FOLDER_PATH="/home/ec2-user/$CLIENT_ID"
+          echo "Folder path is: $FOLDER_PATH"
+      
+          # Create folder on remote if needed
+          ssh -i /tmp/key.pem -o StrictHostKeyChecking=no "$USER@$IP_ADDR" "rm -rf $FOLDER_PATH && mkdir -p $FOLDER_PATH"
+      
+          # Transfer files from current directory
+          scp -i /tmp/key.pem -r -o StrictHostKeyChecking=no "$GITHUB_WORKSPACE/" "$USER@$IP_ADDR:$FOLDER_PATH"
+
+      - uses: appleboy/ssh-action@v1
+        name: Operations in the EC2 instance
+        env:
+          CLIENT_ID: ${{ vars.CLIENT_ID }}
+          PING: "pong"
+        with:
+          host: ${{ vars.APIPLUS_EC2_IP_ADDR }}
+          key: ${{ secrets.APIPLUS_EC2_SSH_KEY }}
+          username: ec2-user
+          envs: CLIENT_ID,PING
+          script: |
+              echo "/var/www/$CLIENT_ID"
+              sudo rm -rf /var/www/$CLIENT_ID
+              sudo mkdir -p /var/www/
+              sudo mv /home/ec2-user/$CLIENT_ID /var/www/
+
+
+      - uses: appleboy/ssh-action@v1
+        name: Deploy Next.js Application
+        env:
+          CLIENT_ID: ${{ vars.CLIENT_ID }}
+        with:
+          host: ${{ vars.APIPLUS_EC2_IP_ADDR }}
+          key: ${{ secrets.APIPLUS_EC2_SSH_KEY }}
+          username: ec2-user
+          envs: CLIENT_ID
+          script: |
+            echo "🛠 Starting deployment for CLIENT_ID: $CLIENT_ID"
+      
+            # Find free port and track used ports
+            echo "🔍 Finding an available port..."
+            sudo touch /etc/used_ports
+            PORT=$(comm -23 <(seq 3000 4000 | sort) <(sort /etc/used_ports) | head -n1)
+            echo "✅ Using port: $PORT"
+            echo $PORT | sudo tee -a /etc/used_ports
+      
+            # Navigate to project directory
+            APP_DIR="/var/www/$CLIENT_ID/${{ github.event.repository.name }}/frontend"
+            echo "📁 Navigating to project directory: $APP_DIR"
+            cd $APP_DIR || { echo "❌ Failed to navigate to $APP_DIR"; exit 1; }
+
+            # Add NVM paths to PATH
+            export PATH="/home/ec2-user/.nvm/versions/node/v22.14.0/bin:$PATH"
+            
+            # Verify
+            echo "Updated PATH: $PATH"
+
+            # Add these verification steps
+            echo "Node.js version: $(node -v)"
+            echo "npm version: $(npm -v)"
+            # echo $PATH
+      
+            # Install dependencies and build
+            echo "📦 Installing dependencies..."
+            npm i --legacy-peer-deps || { echo "❌ npm install failed"; exit 1; }
+      
+            echo "🏗 Building the project..."
+            npm run build || { echo "❌ Build failed"; exit 1; }
+      
+            # Configure PM2 process
+            echo "🔁 Restarting PM2 process for $CLIENT_ID (if exists)..."
+            if pm2 describe $CLIENT_ID > /dev/null 2>&1; then
+              pm2 delete $CLIENT_ID
+              echo "♻️ Deleted existing PM2 process: $CLIENT_ID"
+            fi
+      
+            echo "🚀 Starting new PM2 process on port $PORT..."
+            pm2 start npm --name "$CLIENT_ID" -- start -- --port=$PORT || { echo "❌ Failed to start PM2 process"; exit 1; }
+      
+            echo "💾 Saving PM2 state..."
+            pm2 save
+            pm2 startup
+      
+            # Create Nginx config
+            # NGINX_CONF="/etc/nginx/sites-available/$CLIENT_ID.conf"
+            NGINX_CONF="/etc/nginx/locations-available/agent.sikka.ai/$CLIENT_ID.conf"
+            echo "📝 Creating Nginx config at $NGINX_CONF"
+            
+            sudo tee $NGINX_CONF > /dev/null <<EOF
+
+            # HTTP redirection to HTTPS
+            location /$CLIENT_ID {
+              proxy_pass http://localhost:$PORT;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade \$http_upgrade;
+              proxy_set_header Connection 'upgrade';
+              proxy_set_header Host \$host;
+              proxy_set_header X-Real-IP \$remote_addr;
+              proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto \$scheme;
+              proxy_cache_bypass \$http_upgrade;
+            }
+
+            EOF
+
+            
+            # Test Nginx configuration before applying
+            echo "🔍 Testing Nginx configuration..."
+            sudo nginx -t || { echo "❌ Nginx configuration test failed"; exit 1; }
+            
+            # Enable and reload Nginx if test passed
+            sudo systemctl reload nginx
