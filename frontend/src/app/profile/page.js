@@ -6,22 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function ProfilePage() {
-  const [patientData, setPatientData] = useState(null);
+  const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
         const response = await axios.get('/api/patients');
-        setPatientData(response.data[0]); // Get the first patient for demo
+        setPatient(response.data[0]); // Just use the first patient for demo
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching patient data:", error);
-      } finally {
+        console.error('Error fetching patient data:', error);
         setLoading(false);
       }
     };
@@ -33,23 +32,36 @@ export default function ProfilePage() {
     <div className="flex min-h-screen bg-slate-50">
       <Navigation />
       
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-8">
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">My Profile</h1>
-            <p className="text-slate-500 mt-1">Manage your personal information and preferences</p>
+            <h1 className="text-3xl font-bold text-slate-900">Your Profile</h1>
+            <p className="text-slate-500 mt-2">Manage your personal information and preferences</p>
           </header>
 
           {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="space-y-6">
+              <Card className="animate-pulse">
+                <CardHeader>
+                  <div className="h-7 bg-slate-200 rounded w-1/4 mb-2"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="h-10 bg-slate-200 rounded"></div>
+                    <div className="h-10 bg-slate-200 rounded"></div>
+                    <div className="h-10 bg-slate-200 rounded"></div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           ) : (
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
-                <TabsTrigger value="personal">Personal Info</TabsTrigger>
+              <TabsList className="mb-6">
+                <TabsTrigger value="personal">Personal Information</TabsTrigger>
                 <TabsTrigger value="medical">Medical History</TabsTrigger>
                 <TabsTrigger value="insurance">Insurance</TabsTrigger>
+                <TabsTrigger value="preferences">Preferences</TabsTrigger>
               </TabsList>
               
               <TabsContent value="personal">
@@ -59,62 +71,53 @@ export default function ProfilePage() {
                     <CardDescription>Update your personal details</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col md:flex-row gap-8 items-start">
-                      <div className="flex flex-col items-center">
-                        <Avatar className="h-24 w-24">
-                          <AvatarFallback className="text-2xl bg-blue-100 text-blue-600">
-                            {patientData?.firstName?.charAt(0)}{patientData?.lastName?.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <Button variant="outline" size="sm" className="mt-4">
-                          Change Photo
-                        </Button>
+                    <form className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstName">First Name</Label>
+                          <Input id="firstName" defaultValue={patient?.firstName} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastName">Last Name</Label>
+                          <Input id="lastName" defaultValue={patient?.lastName} />
+                        </div>
                       </div>
                       
-                      <div className="flex-1 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" defaultValue={patientData?.firstName || "Sarah"} />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" defaultValue={patientData?.lastName || "Johnson"} />
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" defaultValue={patientData?.email || "sarah.johnson@example.com"} />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="phone">Phone Number</Label>
-                            <Input id="phone" defaultValue={patientData?.phone || "(555) 123-4567"} />
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="dob">Date of Birth</Label>
-                            <Input id="dob" defaultValue={patientData?.dateOfBirth || "05/12/1985"} />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="gender">Gender</Label>
-                            <Input id="gender" defaultValue={patientData?.gender || "Female"} />
-                          </div>
-                        </div>
-                        
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="address">Address</Label>
-                          <Input id="address" defaultValue={patientData?.address || "123 Main St, Anytown, CA 12345"} />
+                          <Label htmlFor="email">Email</Label>
+                          <Input id="email" type="email" defaultValue={patient?.email} />
                         </div>
-                        
-                        <div className="flex justify-end">
-                          <Button>Save Changes</Button>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input id="phone" defaultValue={patient?.phone} />
                         </div>
                       </div>
-                    </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Address</Label>
+                        <Input id="address" defaultValue={patient?.address} />
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="city">City</Label>
+                          <Input id="city" defaultValue={patient?.city} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="state">State</Label>
+                          <Input id="state" defaultValue={patient?.state} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="zipCode">Zip Code</Label>
+                          <Input id="zipCode" defaultValue={patient?.zipCode} />
+                        </div>
+                      </div>
+                      
+                      <div className="pt-4">
+                        <Button>Save Changes</Button>
+                      </div>
+                    </form>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -123,47 +126,43 @@ export default function ProfilePage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Medical History</CardTitle>
-                    <CardDescription>Your health information</CardDescription>
+                    <CardDescription>View and update your medical information</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
                       <div>
                         <h3 className="text-lg font-medium mb-2">Allergies</h3>
-                        <div className="bg-slate-50 p-4 rounded-md">
-                          <p>Penicillin - Severe reaction</p>
-                          <p>Peanuts - Mild reaction</p>
-                        </div>
+                        <p className="text-slate-500">{patient?.allergies || "No known allergies"}</p>
                       </div>
                       
                       <div>
                         <h3 className="text-lg font-medium mb-2">Current Medications</h3>
-                        <div className="bg-slate-50 p-4 rounded-md">
-                          <p>Lisinopril 10mg - Once daily</p>
-                          <p>Atorvastatin 20mg - Once daily</p>
-                          <p>Multivitamin - Once daily</p>
-                        </div>
+                        <ul className="list-disc pl-5 text-slate-500">
+                          {patient?.medications?.length > 0 ? (
+                            patient.medications.map((med, index) => (
+                              <li key={index}>{med}</li>
+                            ))
+                          ) : (
+                            <li>No current medications</li>
+                          )}
+                        </ul>
                       </div>
                       
                       <div>
-                        <h3 className="text-lg font-medium mb-2">Past Surgeries</h3>
-                        <div className="bg-slate-50 p-4 rounded-md">
-                          <p>Appendectomy - 2010</p>
-                          <p>Knee arthroscopy - 2015</p>
-                        </div>
+                        <h3 className="text-lg font-medium mb-2">Medical Conditions</h3>
+                        <ul className="list-disc pl-5 text-slate-500">
+                          {patient?.conditions?.length > 0 ? (
+                            patient.conditions.map((condition, index) => (
+                              <li key={index}>{condition}</li>
+                            ))
+                          ) : (
+                            <li>No medical conditions on record</li>
+                          )}
+                        </ul>
                       </div>
                       
-                      <div>
-                        <h3 className="text-lg font-medium mb-2">Family History</h3>
-                        <div className="bg-slate-50 p-4 rounded-md">
-                          <p>Father: Hypertension, Type 2 Diabetes</p>
-                          <p>Mother: Breast cancer (age 65)</p>
-                          <p>Sibling: No significant conditions</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-end">
-                        <Button variant="outline" className="mr-2">Request Changes</Button>
-                        <Button>Download Records</Button>
+                      <div className="pt-4">
+                        <Button>Request Medical Records Update</Button>
                       </div>
                     </div>
                   </CardContent>
@@ -174,47 +173,67 @@ export default function ProfilePage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Insurance Information</CardTitle>
-                    <CardDescription>Your coverage details</CardDescription>
+                    <CardDescription>Manage your insurance details</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-6">
+                    <form className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="provider">Insurance Provider</Label>
-                          <Input id="provider" defaultValue="Blue Cross Blue Shield" />
+                          <Label htmlFor="insuranceProvider">Insurance Provider</Label>
+                          <Input id="insuranceProvider" defaultValue={patient?.insurance?.provider} />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="planType">Plan Type</Label>
-                          <Input id="planType" defaultValue="PPO" />
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="policyNumber">Policy Number</Label>
-                          <Input id="policyNumber" defaultValue="XYZ123456789" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="groupNumber">Group Number</Label>
-                          <Input id="groupNumber" defaultValue="GRP987654321" />
+                          <Input id="policyNumber" defaultValue={patient?.insurance?.policyNumber} />
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="policyHolder">Policy Holder Name</Label>
-                          <Input id="policyHolder" defaultValue="Sarah Johnson" />
+                          <Label htmlFor="groupNumber">Group Number</Label>
+                          <Input id="groupNumber" defaultValue={patient?.insurance?.groupNumber} />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="relationship">Relationship to Policy Holder</Label>
-                          <Input id="relationship" defaultValue="Self" />
+                          <Label htmlFor="policyHolder">Policy Holder Name</Label>
+                          <Input id="policyHolder" defaultValue={patient?.insurance?.policyHolder} />
                         </div>
                       </div>
                       
-                      <div className="flex justify-end">
-                        <Button>Save Changes</Button>
+                      <div className="pt-4">
+                        <Button>Update Insurance Information</Button>
                       </div>
-                    </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="preferences">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Communication Preferences</CardTitle>
+                    <CardDescription>Manage how you receive notifications and communications</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form className="space-y-6">
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="emailNotifications" className="h-4 w-4" defaultChecked />
+                        <Label htmlFor="emailNotifications">Email notifications for appointments</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="smsNotifications" className="h-4 w-4" defaultChecked />
+                        <Label htmlFor="smsNotifications">SMS reminders for appointments</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="newsletterSubscription" className="h-4 w-4" />
+                        <Label htmlFor="newsletterSubscription">Subscribe to health newsletter</Label>
+                      </div>
+                      
+                      <div className="pt-4">
+                        <Button>Save Preferences</Button>
+                      </div>
+                    </form>
                   </CardContent>
                 </Card>
               </TabsContent>

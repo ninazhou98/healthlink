@@ -1,230 +1,231 @@
 "use client";
 
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, Send, Plus, Search } from "lucide-react";
 import { useState } from "react";
-import { Send, Search } from "lucide-react";
 
 export default function MessagesPage() {
-  const [selectedConversation, setSelectedConversation] = useState(0);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   
   const conversations = [
     {
-      id: 0,
-      name: "Dr. Johnson",
-      role: "Primary Care",
-      avatar: "J",
-      unread: true,
-      lastMessage: "Your lab results look good. Let me know if you have questions.",
-      messages: [
-        { sender: "doctor", content: "Hello Sarah, I've reviewed your recent lab results.", time: "10:30 AM" },
-        { sender: "doctor", content: "Your cholesterol levels have improved since your last visit. Keep up the good work with your diet changes!", time: "10:31 AM" },
-        { sender: "patient", content: "That's great news! I've been trying to eat more vegetables and less processed food.", time: "10:45 AM" },
-        { sender: "doctor", content: "Your lab results look good. Let me know if you have questions.", time: "11:02 AM" },
-      ]
-    },
-    {
       id: 1,
-      name: "Dr. Smith",
-      role: "Dentist",
-      avatar: "S",
-      unread: false,
-      lastMessage: "Don't forget your 6-month cleaning next month.",
-      messages: [
-        { sender: "doctor", content: "Hi Sarah, just a reminder about your upcoming dental cleaning.", time: "Yesterday" },
-        { sender: "doctor", content: "Don't forget your 6-month cleaning next month.", time: "Yesterday" },
-      ]
+      name: "Dr. Sarah Johnson",
+      role: "Primary Care Physician",
+      avatar: "SJ",
+      lastMessage: "Your test results look good. Let's discuss at your next appointment.",
+      time: "10:30 AM",
+      unread: true,
     },
     {
       id: 2,
-      name: "Nurse Williams",
-      role: "Cardiology Dept.",
-      avatar: "W",
+      name: "Dr. Michael Chen",
+      role: "Cardiologist",
+      avatar: "MC",
+      lastMessage: "Remember to take your medication as prescribed.",
+      time: "Yesterday",
       unread: false,
-      lastMessage: "Your prescription has been sent to your pharmacy.",
-      messages: [
-        { sender: "doctor", content: "Hello Sarah, I wanted to let you know that Dr. Garcia has sent your prescription to your pharmacy.", time: "Monday" },
-        { sender: "patient", content: "Thank you for letting me know. Which pharmacy was it sent to?", time: "Monday" },
-        { sender: "doctor", content: "Your prescription has been sent to your pharmacy.", time: "Monday" },
-      ]
-    }
+    },
+    {
+      id: 3,
+      name: "Dr. Emily Rodriguez",
+      role: "Dermatologist",
+      avatar: "ER",
+      lastMessage: "Please send photos of how the treatment is progressing.",
+      time: "Monday",
+      unread: false,
+    },
   ];
+
+  const messages = [
+    {
+      id: 1,
+      conversationId: 1,
+      sender: "Dr. Sarah Johnson",
+      content: "Hello! How are you feeling today?",
+      time: "10:15 AM",
+      isPatient: false,
+    },
+    {
+      id: 2,
+      conversationId: 1,
+      sender: "You",
+      content: "I'm feeling much better, thank you. The new medication seems to be working.",
+      time: "10:20 AM",
+      isPatient: true,
+    },
+    {
+      id: 3,
+      conversationId: 1,
+      sender: "Dr. Sarah Johnson",
+      content: "That's great to hear! Your test results look good. Let's discuss at your next appointment.",
+      time: "10:30 AM",
+      isPatient: false,
+    },
+  ];
+
+  const filteredConversations = conversations.filter(
+    conversation => conversation.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const conversationMessages = messages.filter(
+    message => message.conversationId === activeConversation?.id
+  );
 
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Navigation />
       
-      <main className="flex-1 flex overflow-hidden">
-        <div className="w-full md:w-80 border-r border-slate-200 bg-white flex flex-col">
-          <div className="p-4 border-b border-slate-200">
-            <h1 className="text-xl font-bold text-slate-900">Messages</h1>
-            <div className="relative mt-2">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-              <Input placeholder="Search conversations" className="pl-8" />
+      <main className="flex-1 flex">
+        <div className="w-full md:w-80 lg:w-96 border-r bg-white">
+          <div className="p-4 border-b">
+            <h2 className="text-xl font-bold mb-4">Messages</h2>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input 
+                placeholder="Search conversations" 
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
-          
-          <div className="flex-1 overflow-y-auto">
-            {conversations.map((conversation) => (
-              <div 
-                key={conversation.id}
-                className={`p-4 border-b border-slate-100 cursor-pointer hover:bg-slate-50 ${selectedConversation === conversation.id ? 'bg-blue-50' : ''}`}
-                onClick={() => setSelectedConversation(conversation.id)}
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback className="bg-blue-100 text-blue-600">{conversation.avatar}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium truncate">{conversation.name}</p>
-                      {conversation.unread && (
-                        <span className="h-2 w-2 bg-blue-600 rounded-full"></span>
-                      )}
+          <div className="overflow-y-auto h-[calc(100vh-180px)]">
+            {filteredConversations.length > 0 ? (
+              filteredConversations.map(conversation => (
+                <div 
+                  key={conversation.id}
+                  className={`p-4 border-b cursor-pointer hover:bg-slate-50 ${
+                    activeConversation?.id === conversation.id ? "bg-slate-50" : ""
+                  }`}
+                  onClick={() => setActiveConversation(conversation)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
+                      {conversation.avatar}
                     </div>
-                    <p className="text-xs text-slate-500">{conversation.role}</p>
-                    <p className="text-sm text-slate-600 truncate mt-1">{conversation.lastMessage}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-medium truncate">{conversation.name}</h3>
+                        <span className="text-xs text-slate-500">{conversation.time}</span>
+                      </div>
+                      <p className="text-xs text-slate-500">{conversation.role}</p>
+                      <p className="text-sm truncate mt-1">
+                        {conversation.lastMessage}
+                      </p>
+                    </div>
+                    {conversation.unread && (
+                      <div className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0 mt-2"></div>
+                    )}
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-slate-500">
+                No conversations found
               </div>
-            ))}
+            )}
+          </div>
+          <div className="p-4 border-t">
+            <Button className="w-full flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              New Message
+            </Button>
           </div>
         </div>
-        
-        <div className="hidden md:flex flex-1 flex-col">
-          {selectedConversation !== null ? (
+
+        <div className="flex-1 flex flex-col">
+          {activeConversation ? (
             <>
-              <div className="p-4 border-b border-slate-200 bg-white">
+              <div className="p-4 border-b bg-white">
                 <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback className="bg-blue-100 text-blue-600">
-                      {conversations[selectedConversation].avatar}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
+                    {activeConversation.avatar}
+                  </div>
                   <div>
-                    <p className="font-medium">{conversations[selectedConversation].name}</p>
-                    <p className="text-xs text-slate-500">{conversations[selectedConversation].role}</p>
+                    <h3 className="font-medium">{activeConversation.name}</h3>
+                    <p className="text-xs text-slate-500">{activeConversation.role}</p>
                   </div>
                 </div>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {conversations[selectedConversation].messages.map((message, index) => (
-                  <div 
-                    key={index}
-                    className={`flex ${message.sender === 'patient' ? 'justify-end' : 'justify-start'}`}
-                  >
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
+                  {conversationMessages.map(message => (
                     <div 
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.sender === 'patient' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-slate-100 text-slate-800'
-                      }`}
+                      key={message.id} 
+                      className={`flex ${message.isPatient ? "justify-end" : "justify-start"}`}
                     >
-                      <p>{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.sender === 'patient' ? 'text-blue-100' : 'text-slate-500'
-                      }`}>{message.time}</p>
+                      <div 
+                        className={`max-w-[80%] p-3 rounded-lg ${
+                          message.isPatient 
+                            ? "bg-blue-600 text-white" 
+                            : "bg-white border text-slate-900"
+                        }`}
+                      >
+                        <p>{message.content}</p>
+                        <p className={`text-xs mt-1 ${message.isPatient ? "text-blue-100" : "text-slate-500"}`}>
+                          {message.time}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
               
-              <div className="p-4 border-t border-slate-200 bg-white">
+              <div className="p-4 border-t bg-white">
                 <div className="flex gap-2">
                   <Textarea 
                     placeholder="Type your message..." 
-                    className="min-h-[60px] resize-none"
+                    className="min-h-[60px]"
                   />
-                  <Button size="icon" className="h-[60px] w-[60px]">
-                    <Send className="h-5 w-5" />
+                  <Button className="flex-shrink-0">
+                    <Send className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <h3 className="text-lg font-medium text-slate-900">Select a conversation</h3>
-                <p className="text-slate-500 mt-1">Choose a conversation from the list to start messaging</p>
+              <div className="text-center p-6">
+                <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-medium mb-2">No conversation selected</h3>
+                <p className="text-slate-500 mb-4">Choose a conversation from the list or start a new one</p>
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  New Message
+                </Button>
               </div>
             </div>
-          )}
-        </div>
-        
-        {/* Mobile view - show only conversation list or message thread */}
-        <div className="md:hidden flex-1 flex flex-col">
-          {selectedConversation === null ? (
-            <div className="flex-1 flex items-center justify-center p-8">
-              <div className="text-center">
-                <h3 className="text-lg font-medium text-slate-900">Select a conversation</h3>
-                <p className="text-slate-500 mt-1">Choose a conversation from the list to start messaging</p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="p-4 border-b border-slate-200 bg-white">
-                <div className="flex items-center gap-3">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setSelectedConversation(null)}
-                  >
-                    Back
-                  </Button>
-                  <Avatar>
-                    <AvatarFallback className="bg-blue-100 text-blue-600">
-                      {conversations[selectedConversation].avatar}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{conversations[selectedConversation].name}</p>
-                    <p className="text-xs text-slate-500">{conversations[selectedConversation].role}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {conversations[selectedConversation].messages.map((message, index) => (
-                  <div 
-                    key={index}
-                    className={`flex ${message.sender === 'patient' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div 
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.sender === 'patient' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-slate-100 text-slate-800'
-                      }`}
-                    >
-                      <p>{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.sender === 'patient' ? 'text-blue-100' : 'text-slate-500'
-                      }`}>{message.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="p-4 border-t border-slate-200 bg-white">
-                <div className="flex gap-2">
-                  <Textarea 
-                    placeholder="Type your message..." 
-                    className="min-h-[60px] resize-none"
-                  />
-                  <Button size="icon" className="h-[60px] w-[60px]">
-                    <Send className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            </>
           )}
         </div>
       </main>
     </div>
+  );
+}
+
+function MessageSquare(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
   );
 }
